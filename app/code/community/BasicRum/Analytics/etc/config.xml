@@ -1,0 +1,50 @@
+<?xml version="1.0"?>
+<config>
+    <modules>
+        <BasicRum_Analytics>
+            <version>1.0.0</version>
+        </BasicRum_Analytics>
+    </modules>
+
+    <global>
+        <helpers>
+            <basicrum_analytics>
+                <class>BasicRum_Analytics_Helper</class>
+            </basicrum_analytics>
+        </helpers>
+        <blocks>
+            <basicrum_analytics>
+                <class>BasicRum_Analytics_Block</class>
+            </basicrum_analytics>
+        </blocks>
+    </global>
+
+    <frontend>
+        <layout>
+            <updates>
+                <basicrumanalytics>
+                    <file>basicrum_analytics.xml</file>
+                </basicrumanalytics>
+            </updates>
+        </layout>
+    </frontend>
+    <adminhtml>
+        <translate>
+            <modules>
+                <BasicRum_Analytics>
+                    <files>
+                        <default>BasicRum_Analytics.csv</default>
+                    </files>
+                </BasicRum_Analytics>
+            </modules>
+        </translate>
+    </adminhtml>
+
+    <default>
+        <basicrum_analytics>
+            <general>
+                <enabled>0</enabled>
+            </general>
+        </basicrum_analytics>
+    </default>
+</config>

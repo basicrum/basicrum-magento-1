@@ -1,0 +1,8 @@
+<?xml version="1.0"?>
+<layout version="0.1.0">
+    <default>
+        <reference name="footer">
+            <block type="basicrum_analytics/boomerang_loader" name="boomerang" as="boomerang" />
+        </reference>
+    </default>
+</layout>

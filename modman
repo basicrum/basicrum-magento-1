@@ -1,0 +1,21 @@
+# BasicRum Analytics Module for Magento 1
+# This Modman file maps all the module files to their correct locations in Magento
+
+# Module declaration file
+app/etc/modules/BasicRum_Analytics.xml                                         app/etc/modules/BasicRum_Analytics.xml
+
+# Module code files
+app/code/community/BasicRum/Analytics/Block/Boomerang/Loader.php               app/code/community/BasicRum/Analytics/Block/Boomerang/Loader.php
+app/code/community/BasicRum/Analytics/Helper/Data.php                          app/code/community/BasicRum/Analytics/Helper/Data.php
+app/code/community/BasicRum/Analytics/etc/config.xml                           app/code/community/BasicRum/Analytics/etc/config.xml
+app/code/community/BasicRum/Analytics/etc/adminhtml.xml                        app/code/community/BasicRum/Analytics/etc/adminhtml.xml
+app/code/community/BasicRum/Analytics/etc/system.xml                           app/code/community/BasicRum/Analytics/etc/system.xml
+
+# Locale/Translation files
+app/locale/en_US/BasicRum_Analytics.csv                                        app/locale/en_US/BasicRum_Analytics.csv
+
+# Frontend files
+app/design/frontend/base/default/layout/basicrum_analytics.xml                 app/design/frontend/base/default/layout/basicrum_analytics.xml
+js/basicrum/boomerang-1.815.60.cutting-edge.min.js                             public/js/basicrum/boomerang-1.815.60.cutting-edge.min.js
+js/basicrum/boomerang-loader-v15.js                                            public/js/basicrum/boomerang-loader-v15.js
+js/basicrum/opt-in-boomerang-loader-v1-15.js                                   public/js/basicrum/opt-in-boomerang-loader-v1-15.js
