@@ -22,6 +22,10 @@ class BasicRum_Analytics_Block_Boomerang_Loader extends Mage_Core_Block_Abstract
         /** @var BasicRum_Analytics_Helper_Data $helper */
         $helper = Mage::helper('basicrum_analytics');
 
+        if (!$helper->isEnabled()) {
+            return '';
+        }
+
         // 1. Add anti-tampering technique.
         $beaconEndpoint = $helper->getBeaconEndpoint();
         $boomerangJsUrl = Mage::getBaseUrl("js") . "basicrum/boomerang-1.815.60.cutting-edge.min.js";
@@ -31,7 +35,6 @@ class BasicRum_Analytics_Block_Boomerang_Loader extends Mage_Core_Block_Abstract
         } else {
             $loaderScriptUrl = Mage::getBaseUrl("js") . "basicrum/boomerang-loader-v15.js";
         }
-
 
         $pageType = "test";
 
