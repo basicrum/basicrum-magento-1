@@ -81,7 +81,7 @@ class BasicRum_Analytics_Block_Boomerang_Loader extends Mage_Core_Block_Abstract
 
     w.basicRumBoomerangConfig = {
         beacon_url: "{$beaconEndpoint}",
-        instrument_xhr: true,
+        instrument_xhr: false,
         Continuity: {
             enabled: true
         },
