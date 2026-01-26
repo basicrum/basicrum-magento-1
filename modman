@@ -19,4 +19,6 @@ app/locale/en_US/BasicRum_Analytics.csv                                        a
 app/design/frontend/base/default/layout/basicrum_analytics.xml                 app/design/frontend/base/default/layout/basicrum_analytics.xml
 js/basicrum/boomerangs/boomerang-1.815.60.cutting-edge.min.js                  public/js/basicrum/boomerangs/boomerang-1.815.60.cutting-edge.min.js
 js/basicrum/loaders/boomerang-loader-v15.js                                    public/js/basicrum/loaders/boomerang-loader-v15.js
+js/basicrum/loaders/boomerang-loader-v15.min.js                                public/js/basicrum/loaders/boomerang-loader-v15.min.js
 js/basicrum/loaders/consent-boomerang-loader-v1-15.js                          public/js/basicrum/loaders/consent-boomerang-loader-v1-15.js
+js/basicrum/loaders/consent-boomerang-loader-v1-15.min.js                      public/js/basicrum/loaders/consent-boomerang-loader-v1-15.min.js
