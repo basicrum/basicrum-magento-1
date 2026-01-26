@@ -37,11 +37,37 @@ class BasicRum_Analytics_Block_Boomerang_Loader extends Mage_Core_Block_Abstract
         }
 
         $pageType = $helper->getPageType();
+        $waitAfterOnloadEnabled = $helper->isWaitAfterOnloadEnabled();
+        $waitAfterOnloadMilliseconds = $helper->getWaitAfterOnloadMilliseconds();
+
+        $waitAfterOnloadScript = '';
+        if ($waitAfterOnloadEnabled) {
+            $waitAfterOnloadScript = <<<SCRIPT
+    b.plugins = b.plugins || {};
+
+    b.plugins.WaitAfterOnload = {
+        complete: false,
+
+        init: function() {
+            b.subscribe("page_ready", function() {
+                setTimeout(function() {
+                    this.complete = true;
+                    b.sendBeacon();
+                }.bind(this), {$waitAfterOnloadMilliseconds});
+            }, {}, this);
+        },
+
+        is_complete: function() {
+            return this.complete;
+        }
+    };
+
+SCRIPT;
+        }
 
         return <<<SCRIPT
 <script type="text/javascript">
 (function(w) {
-    var WAIT_AFTER_ONLOAD_MILLISECONDS = 5000;
 
     if (!w) {
         return;
@@ -58,26 +84,9 @@ class BasicRum_Analytics_Block_Boomerang_Loader extends Mage_Core_Block_Abstract
 
     var b = w.BOOMR;
     
-    b.url = "{$boomerangJsUrl}"; 
-    
-    b.plugins = b.plugins || {};
+    b.url = "{$boomerangJsUrl}";
 
-    b.plugins.WaitAfterOnload = {
-        complete: false,
-
-        init: function() {
-            b.subscribe("page_ready", function() {
-                setTimeout(function() {
-                    this.complete = true;
-                    b.sendBeacon();
-                }.bind(this), WAIT_AFTER_ONLOAD_MILLISECONDS);
-            }, {}, this);
-        },
-
-        is_complete: function() {
-            return this.complete;
-        }
-    };
+{$waitAfterOnloadScript}
 
     w.basicRumBoomerangConfig = {
         beacon_url: "{$beaconEndpoint}",

@@ -45,6 +45,10 @@
             <general>
                 <enabled>0</enabled>
             </general>
+            <wait_after_onload>
+                <enabled>0</enabled>
+                <ms>0</ms>
+            </wait_after_onload>
         </basicrum_analytics>
     </default>
 </config>

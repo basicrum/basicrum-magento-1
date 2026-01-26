@@ -35,6 +35,25 @@ class BasicRum_Analytics_Helper_Data extends Mage_Core_Helper_Abstract
     }
 
     /**
+     * Check if Wait After Onload plugin is enabled
+     * @return bool
+     */
+    public function isWaitAfterOnloadEnabled(): bool
+    {
+        return Mage::getStoreConfigFlag('basicrum_analytics/wait_after_onload/enabled');
+    }
+
+    /**
+     * Get wait after onload milliseconds
+     * @return int
+     */
+    public function getWaitAfterOnloadMilliseconds(): int
+    {
+        $value = (int) Mage::getStoreConfig('basicrum_analytics/wait_after_onload/wait_ms');
+        return max(0, $value);
+    }
+
+    /**
      * Get current page type based on layout handles
      *
      * @return string

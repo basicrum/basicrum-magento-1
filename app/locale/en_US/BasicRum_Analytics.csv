@@ -5,3 +5,6 @@
 "Enable Analytics","Enable Analytics"
 "Beacon Endpoint URL","Beacon Endpoint URL"
 "Enter the URL where analytics data will be sent","Enter the URL where analytics data will be sent"
+"Enable Wait After Onload","Enable Wait After Onload"
+"Wait After Onload (ms)","Wait After Onload (ms)"
+"Milliseconds to delay the beacon to capture additional metrics.","Milliseconds to delay the beacon to capture additional metrics."
