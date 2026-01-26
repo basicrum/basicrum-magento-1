@@ -33,4 +33,17 @@ class BasicRum_Analytics_Helper_Data extends Mage_Core_Helper_Abstract
     {
         return Mage::getStoreConfig('basicrum_analytics/general/beacon_endpoint');
     }
+
+    /**
+     * Get current page type based on layout handles
+     *
+     * @return string
+     */
+    public function getPageType(): string
+    {
+        /** @var BasicRum_Analytics_Helper_PageTypeDetector $detector */
+        $detector = Mage::helper('basicrum_analytics/pageTypeDetector');
+
+        return $detector->getPageType();
+    }
 }

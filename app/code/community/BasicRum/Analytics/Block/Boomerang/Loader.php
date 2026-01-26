@@ -36,7 +36,7 @@ class BasicRum_Analytics_Block_Boomerang_Loader extends Mage_Core_Block_Abstract
             $loaderScriptUrl = Mage::getBaseUrl("js") . "basicrum/boomerang-loader-v15.js";
         }
 
-        $pageType = "test";
+        $pageType = $helper->getPageType();
 
         return <<<SCRIPT
 <script type="text/javascript">

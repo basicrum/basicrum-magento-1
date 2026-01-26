@@ -21,6 +21,12 @@ The BasicRUM Analytics module provides analytics integration with BasicRUM for M
 The module configuration can be found in:
 - System > Configuration > BasicRum Analytics
 
+## Page Type Detection
+
+The module sends `p_type` to Boomerang based on Magento layout handles. Known handles are mapped
+to friendly page types (e.g., `cms_index_index` → `home`, `catalog_product_view` → `product`).
+If no known handle matches, the first non-generic handle is sent as `unmapped_{handle}`.
+
 ## Version
 
 1.0.0
