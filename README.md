@@ -27,6 +27,26 @@ The module sends `p_type` to Boomerang based on Magento layout handles. Known ha
 to friendly page types (e.g., `cms_index_index` → `home`, `catalog_product_view` → `product`).
 If no known handle matches, the first non-generic handle is sent as `unmapped_{handle}`.
 
+## Developer
+
+### Minifying Loader Scripts
+
+Use UglifyJS to minify the Boomerang loader scripts with IE compatibility:
+
+```bash
+# Standard loader
+npx uglify-js js/basicrum/loaders/boomerang-loader-v15.js \
+  --mangle \
+  --compress sequences=false,ie=true \
+  --output js/basicrum/loaders/boomerang-loader-v15.min.js
+
+# Consent loader (GDPR opt-in)
+npx uglify-js js/basicrum/loaders/consent-boomerang-loader-v1-15.js \
+  --mangle \
+  --compress sequences=false,ie=true \
+  --output js/basicrum/loaders/consent-boomerang-loader-v1-15.min.js
+```
+
 ## Version
 
 1.0.0

@@ -8,3 +8,6 @@
 "Enable Wait After Onload","Enable Wait After Onload"
 "Wait After Onload (ms)","Wait After Onload (ms)"
 "Milliseconds to delay the beacon to capture additional metrics.","Milliseconds to delay the beacon to capture additional metrics."
+"Developer","Developer"
+"Use Unminified Loaders","Use Unminified Loaders"
+"Enable to load non-minified loader scripts for debugging purposes.","Enable to load non-minified loader scripts for debugging purposes."

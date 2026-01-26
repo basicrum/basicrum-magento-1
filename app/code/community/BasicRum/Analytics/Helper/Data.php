@@ -27,9 +27,9 @@ class BasicRum_Analytics_Helper_Data extends Mage_Core_Helper_Abstract
 
     /**
      * Get beacon endpoint URL
-     * @return string
+     * @return string|null
      */
-    public function getBeaconEndpoint(): null|string
+    public function getBeaconEndpoint()
     {
         return Mage::getStoreConfig('basicrum_analytics/general/beacon_endpoint');
     }
@@ -51,6 +51,15 @@ class BasicRum_Analytics_Helper_Data extends Mage_Core_Helper_Abstract
     {
         $value = (int) Mage::getStoreConfig('basicrum_analytics/wait_after_onload/wait_ms');
         return max(0, $value);
+    }
+
+    /**
+     * Check if unminified loaders should be used (for debugging)
+     * @return bool
+     */
+    public function useUnminifiedLoaders(): bool
+    {
+        return Mage::getStoreConfigFlag('basicrum_analytics/developer/use_unminified_loaders');
     }
 
     /**

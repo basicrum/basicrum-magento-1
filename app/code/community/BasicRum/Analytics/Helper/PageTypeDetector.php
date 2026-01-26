@@ -70,7 +70,7 @@ class BasicRum_Analytics_Helper_PageTypeDetector extends Mage_Core_Helper_Abstra
      * @param string[] $handles
      * @return string|null
      */
-    private function getFallbackHandle(array $handles): null|string
+    private function getFallbackHandle(array $handles)
     {
         $ignoredHandles = [
             'default',
@@ -83,7 +83,7 @@ class BasicRum_Analytics_Helper_PageTypeDetector extends Mage_Core_Helper_Abstra
                 continue;
             }
 
-            if (str_starts_with($handle, 'STORE_') || str_starts_with($handle, 'THEME_')) {
+            if (strncmp($handle, 'STORE_', 6) === 0 || strncmp($handle, 'THEME_', 6) === 0) {
                 continue;
             }
 

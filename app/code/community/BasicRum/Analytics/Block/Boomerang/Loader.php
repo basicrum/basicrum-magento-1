@@ -7,7 +7,6 @@ declare(strict_types=1);
 class BasicRum_Analytics_Block_Boomerang_Loader extends Mage_Core_Block_Abstract
 {
 
-    #[\Override]
     protected function _toHtml() : string
     {
         return $this->getBoomerangSnippet();
@@ -28,12 +27,18 @@ class BasicRum_Analytics_Block_Boomerang_Loader extends Mage_Core_Block_Abstract
 
         // 1. Add anti-tampering technique.
         $beaconEndpoint = $helper->getBeaconEndpoint();
-        $boomerangJsUrl = Mage::getBaseUrl("js") . "basicrum/boomerang-1.815.60.cutting-edge.min.js";
+        if ($beaconEndpoint === null || trim($beaconEndpoint) === '') {
+            return '';
+        }
+
+        $boomerangJsUrl = Mage::getBaseUrl("js") . "basicrum/boomerangs/boomerang-1.815.60.cutting-edge.min.js";
+
+        $loaderSuffix = $helper->useUnminifiedLoaders() ? '.js' : '.min.js';
 
         if ($helper->isOptInRequired()) {
-            $loaderScriptUrl = Mage::getBaseUrl("js") . "basicrum/opt-in-boomerang-loader-v1-15.js";
+            $loaderScriptUrl = Mage::getBaseUrl("js") . "basicrum/loaders/consent-boomerang-loader-v1-15" . $loaderSuffix;
         } else {
-            $loaderScriptUrl = Mage::getBaseUrl("js") . "basicrum/boomerang-loader-v15.js";
+            $loaderScriptUrl = Mage::getBaseUrl("js") . "basicrum/loaders/boomerang-loader-v15" . $loaderSuffix;
         }
 
         $pageType = $helper->getPageType();

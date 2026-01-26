@@ -1,18 +1,22 @@
-(function() {
+// Ultra-concise version
+(function(mainWin) {
+  function loadBoomr(w) {
+    // Your opted-in code here
     // Boomerang Loader Snippet version 15
-    if (window.BOOMR && (window.BOOMR.version || window.BOOMR.snippetExecuted)) {
+    if (w.BOOMR && (w.BOOMR.version || w.BOOMR.snippetExecuted)) {
         return;
     }
 
-    window.BOOMR = window.BOOMR || {};
+    w.BOOMR = w.BOOMR || {};
 
-    if (!window.BOOMR.url) {
+    // Ensure url is an own property (protect against prototype pollution)
+    if (!Object.prototype.hasOwnProperty.call(w.BOOMR, "url") || !w.BOOMR.url) {
         return;
     }
 
-    window.BOOMR.snippetStart = new Date().getTime();
-    window.BOOMR.snippetExecuted = true;
-    window.BOOMR.snippetVersion = 15;
+    w.BOOMR.snippetStart = new Date().getTime();
+    w.BOOMR.snippetExecuted = true;
+    w.BOOMR.snippetVersion = 15;
 
     // document.currentScript is supported in all browsers other than IE
     var where = document.currentScript || document.getElementsByTagName("script")[0],
@@ -32,7 +36,7 @@
         var script = document.createElement("script");
 
         script.id = "boomr-scr-as";
-        script.src = window.BOOMR.url;
+        script.src = w.BOOMR.url;
 
         // Not really needed since dynamic scripts are async by default and the script is already in cache at this point,
         // but some naive parsers will see a missing async attribute and think we're not async
@@ -51,16 +55,16 @@
         var dom,
         doc = document,
         bootstrap, iframe, iframeStyle,
-        win = window;
+        win = w;
 
-        window.BOOMR.snippetMethod = wasFallback ? "if" : "i";
+        w.BOOMR.snippetMethod = wasFallback ? "if" : "i";
 
         // Adds Boomerang within the iframe
         bootstrap = function(parent, scriptId) {
         var script = doc.createElement("script");
 
         script.id = scriptId || "boomr-if-as";
-        script.src = window.BOOMR.url;
+        script.src = w.BOOMR.url;
 
         BOOMR_lstart = new Date().getTime();
 
@@ -72,8 +76,8 @@
         // * IE 6/7 don't support 'about:blank' for an iframe src (it triggers warnings on secure sites)
         // * IE 8 required a doc write call for it to work, which is bad practice
         // This means loading on IE 6/7/8 may cause SPoF.
-        if (!window.addEventListener && window.attachEvent && navigator.userAgent.match(/MSIE [678]\./)) {
-            window.BOOMR.snippetMethod = "s";
+        if (!w.addEventListener && w.attachEvent && navigator.userAgent.match(/MSIE [678]\./)) {
+            w.BOOMR.snippetMethod = "s";
 
             bootstrap(parentNode, "boomr-async");
 
@@ -148,10 +152,10 @@
     typeof link.relList.supports === "function" &&
     link.relList.supports("preload") &&
     ("as" in link)) {
-        window.BOOMR.snippetMethod = "p";
+        w.BOOMR.snippetMethod = "p";
 
         // Set attributes to trigger a Preload
-        link.href = window.BOOMR.url;
+        link.href = w.BOOMR.url;
         link.rel  = "preload";
         link.as   = "script";
 
@@ -181,13 +185,30 @@
 
     // Save when the onload event happened, in case this is a non-NavigationTiming browser
     function boomerangSaveLoadTime(e) {
-        window.BOOMR_onload = (e && e.timeStamp) || new Date().getTime();
+        w.BOOMR_onload = (e && e.timeStamp) || new Date().getTime();
     }
 
-    if (window.addEventListener) {
-        window.addEventListener("load", boomerangSaveLoadTime, false);
+    if (w.addEventListener) {
+        w.addEventListener("load", boomerangSaveLoadTime, false);
     }
-    else if (window.attachEvent) {
-        window.attachEvent("onload", boomerangSaveLoadTime);
+    else if (w.attachEvent) {
+        w.attachEvent("onload", boomerangSaveLoadTime);
     }
-})();
+  }
+  
+  // Callback function to opt-in to Boomerang tracking
+  mainWin.OPT_IN_BASIC_RUM = function() {
+    document.cookie = 'BRUM_CONSENT="opted-in"; path=/; max-age=31536000'; // 1 year expiry
+    loadBoomr(mainWin);
+  };
+  
+  // Callback function to opt-out of Boomerang tracking
+  mainWin.OPT_OUT_BASIC_RUM = function() {
+    document.cookie = 'BRUM_CONSENT="opted-out"; path=/; max-age=31536000'; // 1 year expiry
+  };
+  
+  // Check if already opted-in
+  if (document.cookie.indexOf('BRUM_CONSENT="opted-in"') !== -1) {
+    loadBoomr(mainWin);
+  }
+})(window)
