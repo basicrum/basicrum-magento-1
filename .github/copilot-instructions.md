@@ -17,11 +17,10 @@ This module integrates **Boomerang.js** (Real User Monitoring) into Magento 1 st
 - **Deployment**: Uses `modman` for file mapping.
 
 ## Coding Standards & Environment
-- **PHP Version**: **PHP 8.2+**. 
+- **PHP Version**: **PHP 7+** (must remain compatible with PHP 7 while also working on the latest PHP 8.x). 
   - Use `declare(strict_types=1);`.
-  - Use PHP 8 attributes like `#[\Override]`.
-  - Use return type declarations (e.g., `: string`).
-  - Use union types where appropriate (e.g., `null|string`).
+  - Use return type declarations compatible with PHP 7.
+  - Avoid PHP 8-only features (attributes like `#[\Override]`, union types, `str_starts_with`, etc.).
 - **Architecture**:
   - Follow Magento 1 class naming conventions (e.g., `BasicRum_Analytics_Block_Boomerang_Loader`).
   - **No Namespaces**: Do not use PHP namespaces; use underscores for class separation.
