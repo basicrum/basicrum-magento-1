@@ -216,6 +216,19 @@
   mainWin.OPT_OUT_BASIC_RUM = function() {
     var attrs = getCookieAttrs();
     document.cookie = 'BRUM_CONSENT="opted-out"; path=/; max-age=31536000' + attrs.domain + attrs.secure + '; SameSite=Strict'; // 1 year expiry
+
+    // If Boomerang is loaded, disable it and remove its cookies
+    if (mainWin.BOOMR) {
+      if (typeof mainWin.BOOMR.disable === "function") {
+        mainWin.BOOMR.disable();
+      }
+
+      // Remove Boomerang RT (Round Trip) and BA (Bandwidth) cookies using Boomerang's utility
+      if (mainWin.BOOMR.utils && typeof mainWin.BOOMR.utils.removeCookie === "function") {
+        mainWin.BOOMR.utils.removeCookie("RT");
+        mainWin.BOOMR.utils.removeCookie("BA");
+      }
+    }
   };
   
   // Check if already opted-in
