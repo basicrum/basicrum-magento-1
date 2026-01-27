@@ -196,15 +196,26 @@
     }
   }
   
+  // Helper to build cookie attributes
+  function getCookieAttrs() {
+    var hostname = mainWin.location && mainWin.location.hostname;
+    var isSecure = mainWin.location && mainWin.location.protocol === "https:";
+    var secureAttr = isSecure ? "; Secure" : "";
+    var domainAttr = hostname ? "; domain=" + hostname : "";
+    return { secure: secureAttr, domain: domainAttr };
+  }
+
   // Callback function to opt-in to Boomerang tracking
   mainWin.OPT_IN_BASIC_RUM = function() {
-    document.cookie = 'BRUM_CONSENT="opted-in"; path=/; max-age=31536000'; // 1 year expiry
+    var attrs = getCookieAttrs();
+    document.cookie = 'BRUM_CONSENT="opted-in"; path=/; max-age=31536000' + attrs.domain + attrs.secure + '; SameSite=Strict'; // 1 year expiry
     loadBoomr(mainWin);
   };
   
   // Callback function to opt-out of Boomerang tracking
   mainWin.OPT_OUT_BASIC_RUM = function() {
-    document.cookie = 'BRUM_CONSENT="opted-out"; path=/; max-age=31536000'; // 1 year expiry
+    var attrs = getCookieAttrs();
+    document.cookie = 'BRUM_CONSENT="opted-out"; path=/; max-age=31536000' + attrs.domain + attrs.secure + '; SameSite=Strict'; // 1 year expiry
   };
   
   // Check if already opted-in
