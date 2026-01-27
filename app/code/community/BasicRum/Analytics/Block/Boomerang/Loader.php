@@ -45,6 +45,13 @@ class BasicRum_Analytics_Block_Boomerang_Loader extends Mage_Core_Block_Abstract
         $waitAfterOnloadEnabled = $helper->isWaitAfterOnloadEnabled();
         $waitAfterOnloadMilliseconds = $helper->getWaitAfterOnloadMilliseconds();
 
+        $boomerangVars = [
+            ["addVar", "p_type", $pageType],
+            ["addVar", "p_gen", "mage1"]
+        ];
+        $jsonFlags = JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT;
+        $boomerangVarsJs = json_encode($boomerangVars, $jsonFlags);
+
         $waitAfterOnloadScript = '';
         if ($waitAfterOnloadEnabled) {
             $waitAfterOnloadScript = <<<SCRIPT
@@ -80,10 +87,7 @@ SCRIPT;
 
     w.BOOMR_mq = window.BOOMR_mq || [];
 
-    w.BOOMR_mq.push(
-        ["addVar", "p_type", "{$pageType}"],
-        ["addVar", "p_gen", "mage1"]
-    );
+    w.BOOMR_mq.push.apply(w.BOOMR_mq, {$boomerangVarsJs});
 
     w.BOOMR = (w.BOOMR !== undefined) ? w.BOOMR :  {};
 
