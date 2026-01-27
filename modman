@@ -8,6 +8,7 @@ app/etc/modules/BasicRum_Analytics.xml                                         a
 app/code/community/BasicRum/Analytics/Block/Boomerang/Loader.php               app/code/community/BasicRum/Analytics/Block/Boomerang/Loader.php
 app/code/community/BasicRum/Analytics/Helper/Data.php                          app/code/community/BasicRum/Analytics/Helper/Data.php
 app/code/community/BasicRum/Analytics/Helper/PageTypeDetector.php              app/code/community/BasicRum/Analytics/Helper/PageTypeDetector.php
+app/code/community/BasicRum/Analytics/Model/System/Config/Source/Version.php   app/code/community/BasicRum/Analytics/Model/System/Config/Source/Version.php
 app/code/community/BasicRum/Analytics/etc/config.xml                           app/code/community/BasicRum/Analytics/etc/config.xml
 app/code/community/BasicRum/Analytics/etc/adminhtml.xml                        app/code/community/BasicRum/Analytics/etc/adminhtml.xml
 app/code/community/BasicRum/Analytics/etc/system.xml                           app/code/community/BasicRum/Analytics/etc/system.xml

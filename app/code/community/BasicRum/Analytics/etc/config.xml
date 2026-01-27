@@ -12,6 +12,11 @@
                 <class>BasicRum_Analytics_Helper</class>
             </basicrum_analytics>
         </helpers>
+        <models>
+            <basicrum_analytics>
+                <class>BasicRum_Analytics_Model</class>
+            </basicrum_analytics>
+        </models>
         <blocks>
             <basicrum_analytics>
                 <class>BasicRum_Analytics_Block</class>
@@ -43,6 +48,7 @@
     <default>
         <basicrum_analytics>
             <general>
+                <boomerang_version>v1.815.60</boomerang_version>
                 <enabled>0</enabled>
                 <opt_in_required>0</opt_in_required>
             </general>
