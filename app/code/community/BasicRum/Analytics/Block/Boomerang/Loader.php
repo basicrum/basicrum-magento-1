@@ -26,7 +26,7 @@ class BasicRum_Analytics_Block_Boomerang_Loader extends Mage_Core_Block_Abstract
         }
 
         // 1. Add anti-tampering technique.
-        $beaconEndpoint = $helper->getBeaconEndpoint();
+        $beaconEndpoint = Mage::helper('core')->escapeUrl($helper->getBeaconEndpoint());
         if ($beaconEndpoint === null || trim($beaconEndpoint) === '') {
             return '';
         }
