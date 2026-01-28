@@ -50,8 +50,10 @@
             <general>
                 <boomerang_version>v1.815.60</boomerang_version>
                 <enabled>0</enabled>
-                <opt_in_required>0</opt_in_required>
             </general>
+            <privacy>
+                <opt_in_required>0</opt_in_required>
+            </privacy>
             <wait_after_onload>
                 <enabled>0</enabled>
                 <ms>0</ms>

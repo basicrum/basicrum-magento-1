@@ -17,12 +17,12 @@ class BasicRum_Analytics_Helper_Data extends Mage_Core_Helper_Abstract
     }
 
     /**
-     * Check if module is enabled
+     * Check if opt-in consent is required (GDPR mode)
      * @return bool
      */
     public function isOptInRequired(): bool
     {
-        return Mage::getStoreConfigFlag('basicrum_analytics/general/opt_in_required');
+        return Mage::getStoreConfigFlag('basicrum_analytics/privacy/opt_in_required');
     }
 
     /**
