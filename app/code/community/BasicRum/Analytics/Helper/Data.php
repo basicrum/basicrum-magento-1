@@ -31,7 +31,11 @@ class BasicRum_Analytics_Helper_Data extends Mage_Core_Helper_Abstract
      */
     public function getBeaconEndpoint()
     {
-        return Mage::getStoreConfig('basicrum_analytics/general/beacon_endpoint');
+        $url = Mage::getStoreConfig('basicrum_analytics/general/beacon_endpoint');
+        if ($url && filter_var($url, FILTER_VALIDATE_URL)) {
+            return $url;
+        }
+        return null;
     }
 
     /**
