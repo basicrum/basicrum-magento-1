@@ -33,6 +33,10 @@ class BasicRum_Analytics_Helper_Data extends Mage_Core_Helper_Abstract
     {
         $url = Mage::getStoreConfig('basicrum_analytics/general/beacon_endpoint');
         if ($url && filter_var($url, FILTER_VALIDATE_URL)) {
+            // Auto-upgrade HTTP to HTTPS when request is secure to prevent mixed content
+            if (Mage::app()->getRequest()->isSecure()) {
+                $url = preg_replace('/^http:\/\//i', 'https://', $url);
+            }
             return $url;
         }
         return null;
