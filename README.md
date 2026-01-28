@@ -4,15 +4,30 @@ The BasicRUM Analytics module provides analytics integration with BasicRUM for M
 
 ## Installation
 
-1. Copy the module files to your Magento installation:
-   - Copy `app/code/local/BasicRum/Analytics` to your Magento installation's `app/code/local` directory
-   - Copy `app/etc/modules/BasicRum_Analytics.xml` to your Magento installation's `app/etc/modules` directory
+The module can be installed manually by copying files or by using Modman.
 
-2. Clear Magento cache:
+### Option 1: Modman (Recommended)
+
+```bash
+cd /path/to/magento
+modman clone https://github.com/basicrum/basicrum-magento-1.git
+```
+
+### Option 2: Manual Installation
+
+1. Copy the module files to your Magento installation:
+   - Copy `app/code/community/BasicRum/Analytics` to your Magento installation's `app/code/community` directory
+   - Copy `app/etc/modules/BasicRum_Analytics.xml` to your Magento installation's `app/etc/modules` directory
+   - Copy `app/design/frontend/base/default/layout/basicrum_analytics.xml` to your Magento installation's `app/design/frontend/base/default/layout` directory
+   - Copy `js/basicrum` to your Magento installation's `js` directory
+
+### Post-Installation
+
+1. Clear Magento cache:
    - Go to System > Cache Management in the admin panel
    - Click "Flush Magento Cache"
 
-3. Verify the module is enabled:
+2. Verify the module is enabled:
    - Go to System > Configuration > Advanced > Advanced
    - Look for "BasicRum Analytics" in the list of modules
 
