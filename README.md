@@ -2,6 +2,11 @@
 
 The BasicRUM Analytics module provides analytics integration with BasicRUM for Magento 1 stores.
 
+## Requirements
+
+- Magento 1.x (including OpenMage LTS and Maho Commerce)
+- PHP 7.0 or higher (compatible with PHP 8.x)
+
 ## Installation
 
 The module can be installed manually by copying files or by using Modman.
@@ -33,8 +38,54 @@ modman clone https://github.com/basicrum/basicrum-magento-1.git
 
 ## Configuration
 
-The module configuration can be found in:
-- System > Configuration > BasicRum Analytics
+The module configuration can be found in **System > Configuration > BasicRUM Analytics**.
+
+![Admin Configuration](docs/media/admin-area.png)
+
+### General Settings
+
+| Setting | Description |
+|---------|-------------|
+| **Enable** | Enable or disable the module |
+| **Beacon Endpoint URL** | **(Required)** The URL where analytics data will be sent. This should point to your BasicRUM collector endpoint. |
+
+### Data Privacy / GDPR
+
+| Setting | Description |
+|---------|-------------|
+| **Opt-In Required** | When enabled, Boomerang will not load until the visitor gives consent. Use the JavaScript API to integrate with your cookie consent solution. |
+
+**JavaScript API for consent integration:**
+
+```javascript
+// Call when user accepts cookies/tracking
+if (typeof window.OPT_IN_BASIC_RUM === 'function') {
+    window.OPT_IN_BASIC_RUM();
+}
+
+// Call when user rejects tracking
+if (typeof window.OPT_OUT_BASIC_RUM === 'function') {
+    window.OPT_OUT_BASIC_RUM();
+}
+```
+
+**Cookies created:**
+- `BOOMR_CONSENT` - Remembers user consent preference (expires after 1 year)
+- `RT` - Round-trip timing cookie (created on opt-in, deleted on opt-out)
+- `BA` - Bandwidth/latency cookie (created on opt-in, deleted on opt-out)
+
+### Wait After Onload
+
+| Setting | Description |
+|---------|-------------|
+| **Enable Wait After Onload** | Enable delayed beacon sending to capture additional metrics |
+| **Wait After Onload (ms)** | Milliseconds to wait after page load before sending the beacon |
+
+### Developer
+
+| Setting | Description |
+|---------|-------------|
+| **Use Unminified Loaders** | Load non-minified loader scripts for debugging purposes |
 
 ## Page Type Detection
 
