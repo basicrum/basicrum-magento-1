@@ -49,6 +49,12 @@ class BasicRum_Analytics_Block_Boomerang_Loader extends Mage_Core_Block_Abstract
             ["addVar", "p_type", $pageType],
             ["addVar", "p_gen", "mage1"]
         ];
+
+        $siteId = $helper->getBrumSiteId();
+        if ($siteId !== null) {
+            $boomerangVars[] = ["addVar", "brum_site_id", $siteId];
+        }
+
         $jsonFlags = JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT;
         $boomerangVarsJs = json_encode($boomerangVars, $jsonFlags);
 

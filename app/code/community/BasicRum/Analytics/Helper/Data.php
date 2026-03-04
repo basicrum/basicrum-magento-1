@@ -43,6 +43,16 @@ class BasicRum_Analytics_Helper_Data extends Mage_Core_Helper_Abstract
     }
 
     /**
+     * Get the BasicRUM Site ID
+     * @return string|null
+     */
+    public function getBrumSiteId()
+    {
+        $value = Mage::getStoreConfig('basicrum_analytics/general/brum_site_id');
+        return $value ? trim($value) : null;
+    }
+
+    /**
      * Check if Wait After Onload plugin is enabled
      * @return bool
      */

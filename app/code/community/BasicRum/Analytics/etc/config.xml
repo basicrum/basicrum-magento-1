@@ -2,7 +2,7 @@
 <config>
     <modules>
         <BasicRum_Analytics>
-            <version>1.0.0</version>
+            <version>1.0.1</version>
         </BasicRum_Analytics>
     </modules>
 
@@ -50,6 +50,7 @@
             <general>
                 <boomerang_version>v1.815.60</boomerang_version>
                 <enabled>0</enabled>
+                <brum_site_id></brum_site_id>
             </general>
             <privacy>
                 <opt_in_required>0</opt_in_required>

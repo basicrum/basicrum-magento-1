@@ -47,12 +47,22 @@
                         <beacon_endpoint translate="label">
                             <label>Beacon Endpoint URL</label>
                             <frontend_type>text</frontend_type>
-                            <sort_order>3</sort_order>
+                            <sort_order>2</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
                             <comment>Example: https://www.xxxxxx.com/beacon/catcher</comment>
                         </beacon_endpoint>
+                        <brum_site_id translate="label comment">
+                            <label>BasicRUM Site ID</label>
+                            <frontend_type>text</frontend_type>
+                            <backend_model>basicrum_analytics/system_config_backend_siteId</backend_model>
+                            <sort_order>3</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <comment><![CDATA[Unique identifier provided by BasicRUM. Helps to map beacons to your site. <br /> Example: <strong>xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx</strong>]]></comment>
+                        </brum_site_id>
                     </fields>
                 </general>
                 <privacy translate="label">
