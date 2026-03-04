@@ -13,11 +13,11 @@ class BasicRum_Analytics_Helper_PageTypeDetector extends Mage_Core_Helper_Abstra
      */
     public function getPageType(): string
     {
-        $handles = $this->getLayoutHandles();
-
         $pageTypeMap = [
+            'cms_index_noroute' => '404 Not Found',
+            'cms_index_defaultnoroute' => '404 Not Found',
             'cms_index_index' => 'Home',
-            'cms_page' => 'CMS Page',
+            'cms_page_view' => 'CMS Page',
             'catalog_category_view' => 'Category',
             'catalog_product_view' => 'Product',
             'catalogsearch_result_index' => 'Search',
@@ -44,12 +44,20 @@ class BasicRum_Analytics_Helper_PageTypeDetector extends Mage_Core_Helper_Abstra
             'customer_account_forgotpassword' => 'Forgot Password',
         ];
 
-        foreach ($pageTypeMap as $handle => $pageType) {
-            if (in_array($handle, $handles, true)) {
-                return $pageType;
+        $request = Mage::app()->getRequest();
+        if ($request !== null) {
+            $fullActionName = strtolower(
+                $request->getRouteName() . '_' .
+                $request->getControllerName() . '_' .
+                $request->getActionName()
+            );
+
+            if (isset($pageTypeMap[$fullActionName])) {
+                return $pageTypeMap[$fullActionName];
             }
         }
 
+        $handles = $this->getLayoutHandles();
         $fallbackHandle = $this->getFallbackHandle($handles);
         if ($fallbackHandle !== null) {
             return 'unmapped_' . $fallbackHandle;
@@ -84,13 +92,13 @@ class BasicRum_Analytics_Helper_PageTypeDetector extends Mage_Core_Helper_Abstra
     private function getFallbackHandle(array $handles)
     {
         $ignoredHandles = [
-            'default',
-            'print',
-            'popup',
+            'default' => true,
+            'print' => true,
+            'popup' => true,
         ];
 
         foreach ($handles as $handle) {
-            if (in_array($handle, $ignoredHandles, true)) {
+            if (isset($ignoredHandles[$handle])) {
                 continue;
             }
 
