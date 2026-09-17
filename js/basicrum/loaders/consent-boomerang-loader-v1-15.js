@@ -195,44 +195,70 @@
         w.attachEvent("onload", boomerangSaveLoadTime);
     }
   }
-  
-  // Helper to build cookie attributes
-  function getCookieAttrs() {
+
+  // Remove cookies created by older Basicrum consent loaders and Boomerang.
+  function removeCookie(name) {
     var hostname = mainWin.location && mainWin.location.hostname;
-    var isSecure = mainWin.location && mainWin.location.protocol === "https:";
-    var secureAttr = isSecure ? "; Secure" : "";
-    var domainAttr = hostname ? "; domain=" + hostname : "";
-    return { secure: secureAttr, domain: domainAttr };
+    var cookie = name + "=; path=/; max-age=0; SameSite=Strict";
+    var domainParts;
+    var index;
+
+    mainWin.document.cookie = cookie;
+    if (hostname) {
+      domainParts = hostname.split(".");
+      for (index = 0; index < domainParts.length; index++) {
+        mainWin.document.cookie = cookie + "; domain=" + domainParts.slice(index).join(".");
+      }
+    }
   }
 
-  // Callback function to opt-in to Boomerang tracking
-  mainWin.OPT_IN_BASIC_RUM = function() {
-    var attrs = getCookieAttrs();
-    document.cookie = 'BRUM_CONSENT="opted-in"; path=/; max-age=31536000' + attrs.domain + attrs.secure + '; SameSite=Strict'; // 1 year expiry
+  // Callback function to opt-in to Boomerang tracking.
+  mainWin.OPT_IN_BASICRUM_LOADER_WRAPPER = function() {
     loadBoomr(mainWin);
   };
-  
-  // Callback function to opt-out of Boomerang tracking
-  mainWin.OPT_OUT_BASIC_RUM = function() {
-    var attrs = getCookieAttrs();
-    document.cookie = 'BRUM_CONSENT="opted-out"; path=/; max-age=31536000' + attrs.domain + attrs.secure + '; SameSite=Strict'; // 1 year expiry
 
-    // If Boomerang is loaded, disable it and remove its cookies
+  // Consent wrapper opt-out callback: disable collection and remove cookies.
+  mainWin.OPT_OUT_BASICRUM_LOADER_WRAPPER = function() {
+    // Neutralize the inline configuration only after an opt-in has already
+    // started injecting Boomerang on this page: a script that is still
+    // downloading when consent is withdrawn must not initialize when it
+    // arrives, because the bundle only calls BOOMR.init() while
+    // basicRumBoomerangConfig is truthy. A deny that happens before any
+    // opt-in must keep the configuration - fail-closed adapters report deny
+    // before the visitor decides, and a later allow on the same page must
+    // still initialize. After injection, re-granting requires a reload,
+    // matching the documented consent-loader behavior.
+    if (mainWin.BOOMR && mainWin.BOOMR.snippetExecuted) {
+      mainWin.basicRumBoomerangConfig = null;
+      mainWin.basicRumConsentWithdrawn = true;
+    }
+
     if (mainWin.BOOMR) {
+      var waitPlugin = mainWin.BOOMR.plugins && mainWin.BOOMR.plugins.WaitAfterOnload;
+      if (waitPlugin && waitPlugin.timer !== null) {
+        mainWin.clearTimeout(waitPlugin.timer);
+        waitPlugin.timer = null;
+      }
+
       if (typeof mainWin.BOOMR.disable === "function") {
         mainWin.BOOMR.disable();
       }
 
-      // Remove Boomerang RT (Round Trip) and BA (Bandwidth) cookies using Boomerang's utility
       if (mainWin.BOOMR.utils && typeof mainWin.BOOMR.utils.removeCookie === "function") {
         mainWin.BOOMR.utils.removeCookie("RT");
         mainWin.BOOMR.utils.removeCookie("BA");
+        mainWin.BOOMR.utils.removeCookie("BRUM_CONSENT");
+        mainWin.BOOMR.utils.removeCookie("BOOMR_CONSENT");
       }
     }
+
+    removeCookie("RT");
+    removeCookie("BA");
+    removeCookie("BRUM_CONSENT");
+    removeCookie("BOOMR_CONSENT");
   };
-  
-  // Check if already opted-in
-  if (document.cookie.indexOf('BRUM_CONSENT="opted-in"') !== -1) {
-    loadBoomr(mainWin);
-  }
-})(window)
+
+  // Backward-compatible aliases used by earlier Magento 1 integrations.
+  mainWin.OPT_IN_BASIC_RUM = mainWin.OPT_IN_BASICRUM_LOADER_WRAPPER;
+  mainWin.OPT_OUT_BASIC_RUM = mainWin.OPT_OUT_BASICRUM_LOADER_WRAPPER;
+})(window);

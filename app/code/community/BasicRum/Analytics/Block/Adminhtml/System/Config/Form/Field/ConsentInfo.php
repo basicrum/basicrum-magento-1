@@ -2,13 +2,13 @@
 declare(strict_types=1);
 
 /**
- * Custom renderer for consent/opt-in information in admin config
+ * Custom renderer for consent/opt-in information in admin config.
  */
 class BasicRum_Analytics_Block_Adminhtml_System_Config_Form_Field_ConsentInfo
     extends Mage_Adminhtml_Block_System_Config_Form_Field
 {
     /**
-     * Render the field with custom info box below
+     * Render the field with consent integration guidance.
      *
      * @param Varien_Data_Form_Element_Abstract $element
      * @return string
@@ -19,63 +19,26 @@ class BasicRum_Analytics_Block_Adminhtml_System_Config_Form_Field_ConsentInfo
 
         $infoHtml = <<<HTML
 <div style="margin-top: 10px; padding: 12px 15px; background: #f8f8f8; border-left: 4px solid #eb5202; border-radius: 3px;">
-    <div style="font-weight: bold; margin-bottom: 8px; color: #333;">
-        JavaScript API for Cookie Consent Integration
-    </div>
-    <div style="margin-bottom: 6px; color: #555;">
-        When opt-in is enabled, Boomerang will not load until consent is given. Use these global functions to integrate with your cookie consent solution:
-    </div>
+    <div style="font-weight: bold; margin-bottom: 8px; color: #333;">JavaScript API for Cookie Consent Integration</div>
+    <p style="color: #555;">In consent-controlled mode, Basicrum stays inert until your external consent tool explicitly allows performance monitoring on the current page. Basicrum does not store or infer a consent decision.</p>
     <table style="margin: 10px 0; border-collapse: collapse;">
         <tr>
-            <td style="padding: 4px 10px 4px 0; font-family: monospace; color: #0066cc; white-space: nowrap;">
-                OPT_IN_BASIC_RUM()
-            </td>
-            <td style="padding: 4px 0; color: #555;">
-                Call when user <strong>accepts</strong> cookies/tracking. Loads Boomerang and sets consent cookie.
-            </td>
+            <td style="padding: 4px 10px 4px 0; font-family: monospace; color: #0066cc; white-space: nowrap;">OPT_IN_BASICRUM_LOADER_WRAPPER()</td>
+            <td style="padding: 4px 0; color: #555;">Call when the external tool reports that monitoring is allowed.</td>
         </tr>
         <tr>
-            <td style="padding: 4px 10px 4px 0; font-family: monospace; color: #cc0000; white-space: nowrap;">
-                OPT_OUT_BASIC_RUM()
-            </td>
-            <td style="padding: 4px 0; color: #555;">
-                Call when user <strong>rejects</strong> tracking. Disables Boomerang and clears all RUM cookies.
-            </td>
+            <td style="padding: 4px 10px 4px 0; font-family: monospace; color: #cc0000; white-space: nowrap;">OPT_OUT_BASICRUM_LOADER_WRAPPER()</td>
+            <td style="padding: 4px 0; color: #555;">Call when monitoring is denied or withdrawn. This disables future collection and removes <code>RT</code>, <code>BA</code>, and legacy Basicrum consent cookies, but it cannot retract data already sent.</td>
         </tr>
     </table>
-    <div style="margin-top: 12px; padding-top: 10px; border-top: 1px solid #ddd;">
-        <div style="font-weight: bold; margin-bottom: 6px; color: #333;">
-            Cookies Created
-        </div>
-        <table style="margin: 6px 0; border-collapse: collapse; font-size: 12px;">
-            <tr>
-                <td style="padding: 3px 10px 3px 0; font-family: monospace; color: #666;">BOOMR_CONSENT</td>
-                <td style="padding: 3px 0; color: #555;">Remembers user consent preference (expires after <strong>1 year</strong>)</td>
-            </tr>
-            <tr>
-                <td style="padding: 3px 10px 3px 0; font-family: monospace; color: #666;">RT</td>
-                <td style="padding: 3px 0; color: #555;">Round-trip timing cookie (created on opt-in, deleted on opt-out)</td>
-            </tr>
-            <tr>
-                <td style="padding: 3px 10px 3px 0; font-family: monospace; color: #666;">BA</td>
-                <td style="padding: 3px 0; color: #555;">Bandwidth/latency cookie (created on opt-in, deleted on opt-out)</td>
-            </tr>
-        </table>
-    </div>
-    <div style="margin-top: 12px; padding-top: 10px; border-top: 1px solid #ddd;">
-        <div style="font-weight: bold; margin-bottom: 6px; color: #333;">
-                Integration Example:
-        </div>
-    </div>
+    <p style="color: #555;"><code>OPT_IN_BASIC_RUM()</code> and <code>OPT_OUT_BASIC_RUM()</code> remain available as backward-compatible Magento 1 aliases.</p>
+    <p style="color: #555;">A deny before the first opt-in can be followed by an allow on the same page. After monitoring has started and consent is withdrawn, reload the page before re-granting; monitoring remains disabled for the rest of that page view.</p>
     <div style="margin-top: 12px; padding: 10px; background: #2d2d2d; border-radius: 4px;">
-        <pre style="margin: 0; font-family: 'Monaco', 'Menlo', 'Consolas', monospace; font-size: 11px; line-height: 1.5; color: #f8f8f2; white-space: pre-wrap; word-wrap: break-word;"><span style="color: #888;">// Accept button handler</span>
-<span style="color: #66d9ef;">if</span> (<span style="color: #f92672;">typeof</span> window.OPT_IN_BASIC_RUM <span style="color: #f92672;">===</span> <span style="color: #e6db74;">'function'</span>) {
-    window.<span style="color: #a6e22e;">OPT_IN_BASIC_RUM</span>();
+        <pre style="margin: 0; font-family: Monaco, Menlo, Consolas, monospace; font-size: 11px; line-height: 1.5; color: #f8f8f2; white-space: pre-wrap; word-wrap: break-word;">if (typeof window.OPT_IN_BASICRUM_LOADER_WRAPPER === 'function') {
+    window.OPT_IN_BASICRUM_LOADER_WRAPPER();
 }
-
-<span style="color: #888;">// Reject button handler</span>
-<span style="color: #66d9ef;">if</span> (<span style="color: #f92672;">typeof</span> window.OPT_OUT_BASIC_RUM <span style="color: #f92672;">===</span> <span style="color: #e6db74;">'function'</span>) {
-    window.<span style="color: #a6e22e;">OPT_OUT_BASIC_RUM</span>();
+if (typeof window.OPT_OUT_BASICRUM_LOADER_WRAPPER === 'function') {
+    window.OPT_OUT_BASICRUM_LOADER_WRAPPER();
 }</pre>
     </div>
 </div>

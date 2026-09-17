@@ -83,10 +83,16 @@ class BasicRum_Analytics_Block_Boomerang_Loader extends Mage_Core_Block_Abstract
 
     b.plugins.WaitAfterOnload = {
         complete: false,
+        timer: null,
 
         init: function() {
             b.subscribe("page_ready", function() {
-                setTimeout(function() {
+                this.timer = setTimeout(function() {
+                    this.timer = null;
+                    if (w.basicRumConsentWithdrawn) {
+                        return;
+                    }
+
                     this.complete = true;
                     b.sendBeacon();
                 }.bind(this), {$waitAfterOnloadMilliseconds});
