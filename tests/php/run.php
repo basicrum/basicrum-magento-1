@@ -231,13 +231,18 @@ $tests['admin hides runtime controls while monitoring is disabled'] = function (
     );
     basicrum_assert_same(
         $generalEnabledOnly,
-        basicrum_config_dependency_map($waitFields->enabled, 'wait_after_onload'),
+        basicrum_config_dependency_map($waitFields->wait_enabled, 'wait_after_onload'),
         'wait control must depend on monitoring being enabled'
+    );
+    basicrum_assert_same(
+        'basicrum_analytics/wait_after_onload/enabled',
+        (string) $waitFields->wait_enabled->config_path,
+        'wait control must retain the established public configuration path'
     );
     basicrum_assert_same(
         array(
             'general/enabled' => '1',
-            'wait_after_onload/enabled' => '1',
+            'wait_after_onload/wait_enabled' => '1',
         ),
         basicrum_config_dependency_map($waitFields->wait_ms, 'wait_after_onload'),
         'wait duration must require both enabled monitoring and enabled waiting'

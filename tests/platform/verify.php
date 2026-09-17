@@ -117,13 +117,18 @@ basicrum_platform_assert_same(
 );
 basicrum_platform_assert_same(
     $generalEnabledOnly,
-    basicrum_platform_dependency_map($waitFields->enabled, 'wait_after_onload'),
+    basicrum_platform_dependency_map($waitFields->wait_enabled, 'wait_after_onload'),
     'wait control does not depend on enabled monitoring'
+);
+basicrum_platform_assert_same(
+    'basicrum_analytics/wait_after_onload/enabled',
+    (string) $waitFields->wait_enabled->config_path,
+    'wait control did not retain its established public configuration path'
 );
 basicrum_platform_assert_same(
     array(
         'general/enabled' => '1',
-        'wait_after_onload/enabled' => '1',
+        'wait_after_onload/wait_enabled' => '1',
     ),
     basicrum_platform_dependency_map($waitFields->wait_ms, 'wait_after_onload'),
     'wait duration dependencies were not preserved by the native config parser'
