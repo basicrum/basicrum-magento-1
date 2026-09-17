@@ -42,6 +42,25 @@ basicrum_platform_assert(
 );
 basicrum_platform_assert_same('', $block->getBoomerangSnippet(), 'incomplete configuration emitted monitoring code');
 
+$consentInfo = Mage::app()->getLayout()
+    ->createBlock('basicrum_analytics/adminhtml_system_config_form_field_consentInfo');
+basicrum_platform_assert(
+    $consentInfo instanceof BasicRum_Analytics_Block_Adminhtml_System_Config_Form_Field_ConsentInfo,
+    'Magento did not resolve the Basicrum admin consent renderer'
+);
+
+$siteIdBackend = Mage::getModel('basicrum_analytics/system_config_backend_siteId');
+basicrum_platform_assert(
+    $siteIdBackend instanceof BasicRum_Analytics_Model_System_Config_Backend_SiteId,
+    'Magento did not resolve the Basicrum Site ID backend model'
+);
+
+$beaconBackend = Mage::getModel('basicrum_analytics/system_config_backend_beaconEndpoint');
+basicrum_platform_assert(
+    $beaconBackend instanceof BasicRum_Analytics_Model_System_Config_Backend_BeaconEndpoint,
+    'Magento did not resolve the Basicrum Beacon URL backend model'
+);
+
 $layoutFile = Mage::getConfig()->getNode('frontend/layout/updates/basicrumanalytics/file');
 basicrum_platform_assert_same('basicrum_analytics.xml', (string) $layoutFile, 'frontend layout update is not registered');
 

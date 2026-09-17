@@ -19,7 +19,18 @@ bash "$plugin_root/tests/platform/deploy-module.sh" "$platform" "$platform_root"
 case "$platform" in
     magento-ce)
         ;;
-    openmage|maho)
+    openmage)
+        composer install \
+            --working-dir="$platform_root" \
+            --no-dev \
+            --prefer-dist \
+            --no-interaction \
+            --no-progress
+        ;;
+    maho)
+        # Verify that the extension does not depend on Maho's optional global
+        # aliases for legacy Varien form-element classes.
+        export MAHO_ENABLE_VARIEN_ALIASES=0
         composer install \
             --working-dir="$platform_root" \
             --no-dev \

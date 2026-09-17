@@ -84,6 +84,11 @@ Version 1.1.0 introduces a versioned Magento setup resource for the privacy defa
 
 The migration policy lives in `BasicRum_Analytics_Model_Setup_PrivacyDefault` and is covered by the PHP test harness.
 
+Two 1.1.0 changes can intentionally stop monitoring until configuration or consent integration is corrected:
+
+- Beacon URL and Brum Site ID are now both mandatory, and the Site ID must be a UUID v4. A store with an empty or previously accepted non-v4 Site ID emits no monitoring scripts until a valid backend identifier is saved.
+- Basicrum no longer resumes from a `BRUM_CONSENT` cookie. In consent-controlled mode, the external consent tool must call the opt-in callback on every page after the Basicrum loader has registered it near the end of the document. Calls made before registration are not queued or replayed.
+
 ### Wait After Onload
 
 Enable this option to delay the page-load beacon while collecting additional metrics. The canonical configuration path is:
@@ -120,10 +125,10 @@ Run XML, Modman, Boomerang checksum, and temporary package-archive verification 
 bash tests/check-package.sh
 ```
 
-Regenerate the minified consent wrapper after changing its source:
+Regenerate both minified loaders after changing either source file:
 
 ```bash
-npm run build:consent-loader
+npm run build:loaders
 ```
 
 GitHub Actions runs PHP syntax/tests on PHP 7.4 and 8.3, the Playwright suite, XML validation, and packaging checks.
@@ -134,7 +139,7 @@ It also installs the extension into a real application and boots the storefront 
 |----------|---------|----------|
 | Magento CE 1.9.4.5 | PHP 7.4 | Native setup resource, configuration/rendering, scopes, and live storefront |
 | OpenMage 20.18.0 | PHP 8.3 | Native setup resource, configuration/rendering, scopes, and live storefront |
-| Maho 26.9.0 | PHP 8.3 | Native setup resource, configuration/rendering, scopes, and live storefront |
+| Maho 26.9.0 | PHP 8.3 | Native setup resource, admin rendering with global Varien aliases disabled, configuration/rendering, scopes, and live storefront |
 
 The real-install jobs exercise a fresh privacy-first installation, incomplete and unsafe configuration, immediate and consent-controlled rendering, the 30-second wait cap, default/website/store inheritance, frontend layout injection, callback-compatible loader delivery, and disabled-mode suppression. Platform versions are deliberately pinned so upstream releases cannot silently change the test baseline; updates should be made explicitly after local validation.
 

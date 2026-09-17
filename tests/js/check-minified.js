@@ -5,7 +5,10 @@ const UglifyJS = require("uglify-js");
 
 const root = path.resolve(__dirname, "../..");
 
-for (const loader of ["consent-boomerang-loader-v1-15"]) {
+for (const loader of [
+  "boomerang-loader-v15",
+  "consent-boomerang-loader-v1-15"
+]) {
   const source = fs.readFileSync(
     path.join(root, "js/basicrum/loaders", `${loader}.js`),
     "utf8"

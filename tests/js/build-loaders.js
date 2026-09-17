@@ -3,7 +3,10 @@ const path = require("node:path");
 const UglifyJS = require("uglify-js");
 
 const root = path.resolve(__dirname, "../..");
-const loaders = ["consent-boomerang-loader-v1-15"];
+const loaders = [
+  "boomerang-loader-v15",
+  "consent-boomerang-loader-v1-15"
+];
 
 for (const loader of loaders) {
   const sourcePath = path.join(root, "js/basicrum/loaders", `${loader}.js`);

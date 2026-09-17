@@ -14,3 +14,13 @@ Basicrum-owned code is licensed under the GNU General Public License version 2 o
 - Fork changes vs upstream: maintained commits that remove Long Tasks monitoring, remove the deprecated FID metric and rework Time to First Interaction, drop unused utility functions, and add the Basicrum configuration bootstrap
 
 The Boomerang copyright notice and license remain applicable to the bundled Boomerang file. Basicrum does not relicense that file under the Basicrum GNU General Public License.
+
+## Boomerang Loader Snippet
+
+- Project: [Akamai Boomerang](https://github.com/akamai/boomerang)
+- Bundled and adapted files: `js/basicrum/loaders/boomerang-loader-v15.js`, `js/basicrum/loaders/boomerang-loader-v15.min.js`, and the Boomerang-loading portion of `js/basicrum/loaders/consent-boomerang-loader-v1-15.js` and its minified build
+- License: BSD License
+- License text: `js/basicrum/LICENSE.txt`
+- Provenance: Boomerang Loader Snippet version 15, adapted from the loader distributed by the Akamai Boomerang project. The consent wrapper adds Basicrum-owned lifecycle and withdrawal handling around that loader.
+
+The Akamai Boomerang copyright notice and BSD license remain applicable to the loader code. Basicrum-owned adaptations remain under the extension license without changing the license of the original loader snippet.

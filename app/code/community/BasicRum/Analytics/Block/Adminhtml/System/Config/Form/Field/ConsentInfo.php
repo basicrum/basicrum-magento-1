@@ -1,6 +1,15 @@
 <?php
 declare(strict_types=1);
 
+// Maho can disable its global Varien aliases. Keep the Magento 1 method
+// signature compatible without requiring those aliases throughout the store.
+if (defined('MAHO_ROOT_DIR')
+    && !class_exists('Varien_Data_Form_Element_Abstract', false)
+    && class_exists('Maho\\Data\\Form\\Element\\AbstractElement')
+) {
+    class_alias('Maho\\Data\\Form\\Element\\AbstractElement', 'Varien_Data_Form_Element_Abstract');
+}
+
 /**
  * Custom renderer for consent/opt-in information in admin config.
  */
@@ -20,7 +29,7 @@ class BasicRum_Analytics_Block_Adminhtml_System_Config_Form_Field_ConsentInfo
         $infoHtml = <<<HTML
 <div style="margin-top: 10px; padding: 12px 15px; background: #f8f8f8; border-left: 4px solid #eb5202; border-radius: 3px;">
     <div style="font-weight: bold; margin-bottom: 8px; color: #333;">JavaScript API for Cookie Consent Integration</div>
-    <p style="color: #555;">In consent-controlled mode, Basicrum stays inert until your external consent tool explicitly allows performance monitoring on the current page. Basicrum does not store or infer a consent decision.</p>
+    <p style="color: #555;">In consent-controlled mode, Basicrum stays inert until your external consent tool explicitly allows performance monitoring on the current page. Basicrum does not store or infer a consent decision. Call the API after this loader has registered the callbacks near the end of the page; calls made before registration are not replayed.</p>
     <table style="margin: 10px 0; border-collapse: collapse;">
         <tr>
             <td style="padding: 4px 10px 4px 0; font-family: monospace; color: #0066cc; white-space: nowrap;">OPT_IN_BASICRUM_LOADER_WRAPPER()</td>
