@@ -122,8 +122,9 @@ Legend:
 - [x] Improve complex help content for narrower admin viewports.
   - Long callback names wrap, code fields remain within the available width, and
     copy controls wrap without changing Magento's native configuration layout.
-- [ ] Replace `docs/media/admin-area.png` after the admin UI work is complete; the
-  checked-in screenshot no longer represents the current settings UI.
+- [x] Replace `docs/media/admin-area.png` after the admin UI work is complete.
+  - Captured from the verified OpenMage 20.18.0 test installation at Default
+    Config scope with consent-controlled monitoring enabled.
 
 ## Intentional Magento-specific behavior
 
@@ -161,7 +162,7 @@ Legend:
 - [x] Resolve Track Admin Users applicability.
 - [x] Align terminology and branding.
 - [x] Review narrow-viewport presentation.
-- [ ] Update the admin screenshot after the UI stabilizes.
+- [x] Update the admin screenshot after the UI stabilizes.
 
 ## Completion criteria
 
@@ -173,4 +174,4 @@ Legend:
 - [x] Required configuration errors are visible at the affected fields.
 - [x] Magento configuration scopes continue to work at all supported levels.
 - [x] Platform-specific differences are documented and intentional.
-- [ ] Updated screenshots match the shipped admin UI.
+- [x] Updated screenshots match the shipped admin UI.
