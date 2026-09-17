@@ -33,6 +33,23 @@ class Basicrum_Test_BeaconBackend extends BasicRum_Analytics_Model_System_Config
 
 $tests = array();
 
+function basicrum_config_dependency_map(SimpleXMLElement $field, $defaultFieldset)
+{
+    $dependencies = array();
+
+    if (!isset($field->depends)) {
+        return $dependencies;
+    }
+
+    foreach ($field->depends->children() as $dependency) {
+        $fieldset = isset($dependency->fieldset) ? (string) $dependency->fieldset : $defaultFieldset;
+        $value = isset($dependency->value) ? (string) $dependency->value : (string) $dependency;
+        $dependencies[$fieldset . '/' . $dependency->getName()] = $value;
+    }
+
+    return $dependencies;
+}
+
 $tests['admin consent choices preserve values and explain behavior'] = function () {
     basicrum_test_reset();
 
@@ -164,6 +181,76 @@ $tests['admin consent guidance is a full-width dependent row'] = function () use
         'basicrum_analytics/system_config_source_httpPolicy',
         (string) $xml->sections->basicrum_analytics->groups->developer->fields->development_mode->source_model,
         'HTTP policy must use plain-language choices'
+    );
+};
+
+$tests['admin hides runtime controls while monitoring is disabled'] = function () use ($root) {
+    $xml = simplexml_load_file($root . '/app/code/community/BasicRum/Analytics/etc/system.xml');
+    basicrum_assert_true($xml !== false, 'system configuration XML must parse');
+
+    $groups = $xml->sections->basicrum_analytics->groups;
+    $generalFields = $groups->general->fields;
+    $privacyFields = $groups->privacy->fields;
+    $waitFields = $groups->wait_after_onload->fields;
+    $developerFields = $groups->developer->fields;
+
+    basicrum_assert_same(
+        array(),
+        basicrum_config_dependency_map($generalFields->boomerang_version, 'general'),
+        'Boomerang version must remain visible while monitoring is disabled'
+    );
+    basicrum_assert_same(
+        array(),
+        basicrum_config_dependency_map($generalFields->beacon_endpoint, 'general'),
+        'Beacon URL must remain available for preconfiguration'
+    );
+    basicrum_assert_same(
+        array(),
+        basicrum_config_dependency_map($generalFields->brum_site_id, 'general'),
+        'Site ID must remain available for preconfiguration'
+    );
+
+    $generalEnabledOnly = array('general/enabled' => '1');
+    basicrum_assert_same(
+        $generalEnabledOnly,
+        basicrum_config_dependency_map($privacyFields->strip_query_string, 'privacy'),
+        'query-string privacy must depend on monitoring being enabled'
+    );
+    basicrum_assert_same(
+        $generalEnabledOnly,
+        basicrum_config_dependency_map($privacyFields->opt_in_required, 'privacy'),
+        'consent mode must depend on monitoring being enabled'
+    );
+    basicrum_assert_same(
+        array(
+            'general/enabled' => '1',
+            'privacy/opt_in_required' => '1',
+        ),
+        basicrum_config_dependency_map($privacyFields->consent_integration_info, 'privacy'),
+        'consent guidance must require both enabled monitoring and consent-controlled mode'
+    );
+    basicrum_assert_same(
+        $generalEnabledOnly,
+        basicrum_config_dependency_map($waitFields->enabled, 'wait_after_onload'),
+        'wait control must depend on monitoring being enabled'
+    );
+    basicrum_assert_same(
+        array(
+            'general/enabled' => '1',
+            'wait_after_onload/enabled' => '1',
+        ),
+        basicrum_config_dependency_map($waitFields->wait_ms, 'wait_after_onload'),
+        'wait duration must require both enabled monitoring and enabled waiting'
+    );
+    basicrum_assert_same(
+        $generalEnabledOnly,
+        basicrum_config_dependency_map($developerFields->development_mode, 'developer'),
+        'HTTP policy must depend on monitoring being enabled'
+    );
+    basicrum_assert_same(
+        $generalEnabledOnly,
+        basicrum_config_dependency_map($developerFields->use_unminified_loaders, 'developer'),
+        'loader debugging must depend on monitoring being enabled'
     );
 };
 

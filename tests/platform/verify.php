@@ -78,6 +78,67 @@ basicrum_platform_assert(
     'Magento did not resolve the Basicrum HTTP policy source model'
 );
 
+$adminSection = Mage::getSingleton('adminhtml/config')->getSection('basicrum_analytics');
+basicrum_platform_assert($adminSection !== false, 'Magento did not merge the Basicrum admin configuration');
+$adminGroups = $adminSection->groups;
+$generalFields = $adminGroups->general->fields;
+$privacyFields = $adminGroups->privacy->fields;
+$waitFields = $adminGroups->wait_after_onload->fields;
+$developerFields = $adminGroups->developer->fields;
+$generalEnabledOnly = array('general/enabled' => '1');
+
+basicrum_platform_assert_same(
+    array(),
+    basicrum_platform_dependency_map($generalFields->beacon_endpoint, 'general'),
+    'Beacon URL was hidden behind the module enabled state'
+);
+basicrum_platform_assert_same(
+    array(),
+    basicrum_platform_dependency_map($generalFields->brum_site_id, 'general'),
+    'Site ID was hidden behind the module enabled state'
+);
+basicrum_platform_assert_same(
+    $generalEnabledOnly,
+    basicrum_platform_dependency_map($privacyFields->strip_query_string, 'privacy'),
+    'query-string privacy does not depend on enabled monitoring'
+);
+basicrum_platform_assert_same(
+    $generalEnabledOnly,
+    basicrum_platform_dependency_map($privacyFields->opt_in_required, 'privacy'),
+    'consent mode does not depend on enabled monitoring'
+);
+basicrum_platform_assert_same(
+    array(
+        'general/enabled' => '1',
+        'privacy/opt_in_required' => '1',
+    ),
+    basicrum_platform_dependency_map($privacyFields->consent_integration_info, 'privacy'),
+    'consent guidance dependencies were not preserved by the native config parser'
+);
+basicrum_platform_assert_same(
+    $generalEnabledOnly,
+    basicrum_platform_dependency_map($waitFields->enabled, 'wait_after_onload'),
+    'wait control does not depend on enabled monitoring'
+);
+basicrum_platform_assert_same(
+    array(
+        'general/enabled' => '1',
+        'wait_after_onload/enabled' => '1',
+    ),
+    basicrum_platform_dependency_map($waitFields->wait_ms, 'wait_after_onload'),
+    'wait duration dependencies were not preserved by the native config parser'
+);
+basicrum_platform_assert_same(
+    $generalEnabledOnly,
+    basicrum_platform_dependency_map($developerFields->development_mode, 'developer'),
+    'HTTP policy does not depend on enabled monitoring'
+);
+basicrum_platform_assert_same(
+    $generalEnabledOnly,
+    basicrum_platform_dependency_map($developerFields->use_unminified_loaders, 'developer'),
+    'loader debugging does not depend on enabled monitoring'
+);
+
 $layoutFile = Mage::getConfig()->getNode('frontend/layout/updates/basicrumanalytics/file');
 basicrum_platform_assert_same('basicrum_analytics.xml', (string) $layoutFile, 'frontend layout update is not registered');
 

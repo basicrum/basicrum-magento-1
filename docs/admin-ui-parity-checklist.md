@@ -78,10 +78,15 @@ Legend:
   - Feedback is shown only when monitoring is enabled, uses the resolved field
     values at the current configuration scope, and does not replace the backend
     validation contract.
-- [ ] Disable or hide irrelevant dependent controls when the module is disabled.
+- [x] Disable or hide irrelevant dependent controls when the module is disabled.
+  - Magento's native field dependencies hide and disable privacy, wait, and
+    developer runtime controls. Stored scoped values remain intact.
+  - Boomerang version, Beacon Endpoint URL, and BasicRUM Site ID stay visible so
+    administrators can inspect or prepare identity configuration before enabling.
 - [x] Reveal Wait After Onload milliseconds only when Wait After Onload is enabled.
-- [ ] Review whether consent-specific controls should be disabled when the module
-  itself is disabled.
+- [x] Hide consent-specific controls when the module itself is disabled.
+  - Consent guidance additionally requires consent-controlled mode, including
+    when the controlling values are inherited at Website or Store View scope.
 
 ## Remaining WordPress controls
 

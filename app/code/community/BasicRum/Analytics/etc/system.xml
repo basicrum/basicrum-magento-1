@@ -85,6 +85,12 @@
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
                             <comment>When enabled, complete query strings in page, navigation, referrer, and resource URLs are replaced with ?qs-redacted before beacons are sent. URL paths are still collected. Beacon Endpoint URL parameters are not changed.</comment>
+                            <depends>
+                                <enabled>
+                                    <fieldset>general</fieldset>
+                                    <value>1</value>
+                                </enabled>
+                            </depends>
                         </strip_query_string>
                         <opt_in_required translate="label">
                             <label>Require Consent Before Monitoring</label>
@@ -95,6 +101,12 @@
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
                             <comment>Choose whether Basicrum may begin monitoring immediately or must wait for explicit consent on each page.</comment>
+                            <depends>
+                                <enabled>
+                                    <fieldset>general</fieldset>
+                                    <value>1</value>
+                                </enabled>
+                            </depends>
                         </opt_in_required>
                         <consent_integration_info>
                             <frontend_type>note</frontend_type>
@@ -104,6 +116,10 @@
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
                             <depends>
+                                <enabled>
+                                    <fieldset>general</fieldset>
+                                    <value>1</value>
+                                </enabled>
                                 <opt_in_required>1</opt_in_required>
                             </depends>
                         </consent_integration_info>
@@ -125,6 +141,12 @@
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
+                            <depends>
+                                <enabled>
+                                    <fieldset>general</fieldset>
+                                    <value>1</value>
+                                </enabled>
+                            </depends>
                         </enabled>
                         <wait_ms translate="label">
                             <label>Wait After Onload (ms)</label>
@@ -136,6 +158,10 @@
                             <show_in_store>1</show_in_store>
                             <comment>Milliseconds to delay the beacon to capture additional metrics. Values are limited to 0–30000 milliseconds (30 seconds); larger values are capped at 30000.</comment>
                             <depends>
+                                <enabled>
+                                    <fieldset>general</fieldset>
+                                    <value>1</value>
+                                </enabled>
                                 <enabled>1</enabled>
                             </depends>
                         </wait_ms>
@@ -158,6 +184,12 @@
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
                             <comment>Allow HTTP Beacon URLs only for local testing. Keep HTTPS enforcement enabled on production stores.</comment>
+                            <depends>
+                                <enabled>
+                                    <fieldset>general</fieldset>
+                                    <value>1</value>
+                                </enabled>
+                            </depends>
                         </development_mode>
                         <use_unminified_loaders translate="label comment">
                             <label>Use Unminified Loaders</label>
@@ -168,6 +200,12 @@
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
                             <comment>Enable to load non-minified loader scripts for debugging purposes.</comment>
+                            <depends>
+                                <enabled>
+                                    <fieldset>general</fieldset>
+                                    <value>1</value>
+                                </enabled>
+                            </depends>
                         </use_unminified_loaders>
                     </fields>
                 </developer>

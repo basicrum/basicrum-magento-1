@@ -57,6 +57,23 @@ function basicrum_platform_assert_same($expected, $actual, $message)
     }
 }
 
+function basicrum_platform_dependency_map($field, $defaultFieldset)
+{
+    $dependencies = array();
+
+    if (!isset($field->depends)) {
+        return $dependencies;
+    }
+
+    foreach ($field->depends->children() as $dependency) {
+        $fieldset = isset($dependency->fieldset) ? (string) $dependency->fieldset : $defaultFieldset;
+        $value = isset($dependency->value) ? (string) $dependency->value : (string) $dependency;
+        $dependencies[$fieldset . '/' . $dependency->getName()] = $value;
+    }
+
+    return $dependencies;
+}
+
 function basicrum_platform_save(array $values, $scope = 'default', $scopeId = 0)
 {
     foreach ($values as $path => $value) {

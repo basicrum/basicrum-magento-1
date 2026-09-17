@@ -42,6 +42,8 @@ Monitoring scripts are emitted only when all of these conditions are met:
 
 Both identity values are mandatory. Runtime validation is performed again when rendering, so missing, malformed, or programmatically injected values fail closed even if they bypass the admin backend models. Dynamic JavaScript values are JSON encoded with HTML-significant characters escaped.
 
+When **Enable** is set to No, Magento keeps the bundled Boomerang version, Beacon Endpoint URL, and BasicRUM Site ID visible so an administrator can prepare or inspect the identity configuration before enabling monitoring. Privacy, wait, and developer runtime controls are hidden and disabled through Magento's native field dependencies. Their stored default, website, and store-view values are retained and reappear when monitoring is enabled; normal scope inheritance and **Use Default/Use Website** behavior are unchanged.
+
 HTTPS Beacon URLs are enforced by default. The Developer setting **HTTP Strictness** can allow HTTP only for local testing; do not enable it on production stores. When strict mode is active, an HTTP URL saved through the admin is upgraded to HTTPS, and runtime rendering applies the same upgrade to values injected outside the admin path.
 
 ### Query-string privacy

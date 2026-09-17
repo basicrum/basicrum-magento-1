@@ -102,6 +102,7 @@ The block is added to the `before_body_end` reference in `basicrum_analytics.xml
    - `config.xml`: Module version, models, blocks, helpers, events.
    - `system.xml`: Backend configuration fields (ACL, Scope).
    - `adminhtml.xml`: Admin menu items and ACL resources.
+   - Keep Beacon Endpoint URL and BasicRUM Site ID visible while the module is disabled. Runtime-only privacy, wait, and developer fields use cross-group `system.xml` dependencies on `basicrum_analytics/general/enabled`; preserve those dependencies and Magento's scoped inheritance behavior.
 
 ## Important Patterns
 - **Helpers**: Always access helpers via `Mage::helper('basicrum_analytics')`.
