@@ -11,6 +11,7 @@ require $root . '/app/code/community/BasicRum/Analytics/Model/System/Config/Back
 require $root . '/app/code/community/BasicRum/Analytics/Model/Setup/PrivacyDefault.php';
 require $root . '/app/code/community/BasicRum/Analytics/Model/System/Config/Source/ConsentMode.php';
 require $root . '/app/code/community/BasicRum/Analytics/Block/Adminhtml/System/Config/Form/Field/ConsentInfo.php';
+require $root . '/app/code/community/BasicRum/Analytics/Block/Adminhtml/System/Config/Form/Field/RequiredSetting.php';
 
 class Basicrum_Test_SiteIdBackend extends BasicRum_Analytics_Model_System_Config_Backend_SiteId
 {
@@ -79,6 +80,133 @@ $tests['admin consent guidance is a full-width dependent row'] = function () use
         '1',
         (string) $privacyFields->consent_integration_info->depends->opt_in_required,
         'guidance must depend on consent-controlled mode'
+    );
+};
+
+$tests['enabled incomplete configuration is visibly inactive'] = function () use ($root) {
+    basicrum_test_reset();
+
+    $form = new Basicrum_Test_Form();
+    $enabled = new Varien_Data_Form_Element_Abstract('basicrum_analytics_general_enabled', '1');
+    $beacon = new Varien_Data_Form_Element_Abstract('basicrum_analytics_general_beacon_endpoint', '');
+    $siteId = new Varien_Data_Form_Element_Abstract('basicrum_analytics_general_brum_site_id', '');
+    $form->addElement('basicrum_analytics_general_enabled', $enabled)
+        ->addElement('basicrum_analytics_general_beacon_endpoint', $beacon)
+        ->addElement('basicrum_analytics_general_brum_site_id', $siteId);
+
+    $renderer = new BasicRum_Analytics_Block_Adminhtml_System_Config_Form_Field_RequiredSetting();
+    $beaconHtml = $renderer->render($beacon);
+    $siteIdHtml = $renderer->render($siteId);
+
+    basicrum_assert_contains('aria-required="true"', $beaconHtml, 'enabled Beacon URL must be required');
+    basicrum_assert_contains('aria-invalid="true"', $beaconHtml, 'missing Beacon URL must be invalid');
+    basicrum_assert_contains('validation-failed', $beaconHtml, 'missing Beacon URL must be highlighted');
+    basicrum_assert_contains(
+        'Beacon Endpoint URL is required while monitoring is enabled',
+        $beaconHtml,
+        'missing Beacon URL must have field-level guidance'
+    );
+    basicrum_assert_contains('aria-invalid="true"', $siteIdHtml, 'missing Site ID must be invalid');
+    basicrum_assert_contains(
+        'BasicRUM Site ID is required while monitoring is enabled',
+        $siteIdHtml,
+        'missing Site ID must have field-level guidance'
+    );
+    basicrum_assert_contains(
+        'Basicrum monitoring is enabled but inactive',
+        $siteIdHtml,
+        'incomplete enabled configuration must display a page-level warning'
+    );
+    basicrum_assert_contains(
+        'Monitoring scripts are not emitted',
+        $siteIdHtml,
+        'the warning must explain the runtime consequence'
+    );
+
+    $xml = simplexml_load_file($root . '/app/code/community/BasicRum/Analytics/etc/system.xml');
+    $generalFields = $xml->sections->basicrum_analytics->groups->general->fields;
+    basicrum_assert_same(
+        'basicrum_analytics/adminhtml_system_config_form_field_requiredSetting',
+        (string) $generalFields->beacon_endpoint->frontend_model,
+        'Beacon URL must use the required-setting renderer'
+    );
+    basicrum_assert_same(
+        'basicrum_analytics/adminhtml_system_config_form_field_requiredSetting',
+        (string) $generalFields->brum_site_id->frontend_model,
+        'Site ID must use the required-setting renderer'
+    );
+};
+
+$tests['admin required-setting feedback respects validity enabled state and resolved scope values'] = function () {
+    basicrum_test_reset(array(
+        'basicrum_analytics/general/beacon_endpoint' => 'javascript:alert(1)',
+        'basicrum_analytics/general/brum_site_id' => 'invalid',
+    ));
+
+    $renderer = new BasicRum_Analytics_Block_Adminhtml_System_Config_Form_Field_RequiredSetting();
+
+    $validForm = new Basicrum_Test_Form();
+    $validEnabled = new Varien_Data_Form_Element_Abstract('basicrum_analytics_general_enabled', '1');
+    $validBeacon = new Varien_Data_Form_Element_Abstract(
+        'basicrum_analytics_general_beacon_endpoint',
+        'https://collector.example.test/beacon'
+    );
+    $validSiteId = new Varien_Data_Form_Element_Abstract(
+        'basicrum_analytics_general_brum_site_id',
+        '550e8400-e29b-41d4-a716-446655440000'
+    );
+    $validForm->addElement('basicrum_analytics_general_enabled', $validEnabled)
+        ->addElement('basicrum_analytics_general_beacon_endpoint', $validBeacon)
+        ->addElement('basicrum_analytics_general_brum_site_id', $validSiteId);
+
+    $validHtml = $renderer->render($validBeacon) . $renderer->render($validSiteId);
+    basicrum_assert_contains('aria-invalid="false"', $validHtml, 'valid required fields must not be invalid');
+    basicrum_assert_not_contains('validation-advice', $validHtml, 'valid fields must not display advice');
+    basicrum_assert_not_contains(
+        'Basicrum monitoring is enabled but inactive',
+        $validHtml,
+        'resolved valid scope values must suppress the inactive warning'
+    );
+
+    $disabledForm = new Basicrum_Test_Form();
+    $disabledEnabled = new Varien_Data_Form_Element_Abstract('basicrum_analytics_general_enabled', '0');
+    $disabledBeacon = new Varien_Data_Form_Element_Abstract('basicrum_analytics_general_beacon_endpoint', '');
+    $disabledSiteId = new Varien_Data_Form_Element_Abstract('basicrum_analytics_general_brum_site_id', '');
+    $disabledForm->addElement('basicrum_analytics_general_enabled', $disabledEnabled)
+        ->addElement('basicrum_analytics_general_beacon_endpoint', $disabledBeacon)
+        ->addElement('basicrum_analytics_general_brum_site_id', $disabledSiteId);
+
+    $disabledHtml = $renderer->render($disabledBeacon) . $renderer->render($disabledSiteId);
+    basicrum_assert_contains('aria-required="false"', $disabledHtml, 'disabled monitoring must make fields optional');
+    basicrum_assert_contains('aria-invalid="false"', $disabledHtml, 'disabled empty fields must not be invalid');
+    basicrum_assert_not_contains('validation-advice', $disabledHtml, 'disabled empty fields must not display advice');
+    basicrum_assert_not_contains(
+        'Basicrum monitoring is enabled but inactive',
+        $disabledHtml,
+        'disabled monitoring must not display an inactive warning'
+    );
+
+    $invalidForm = new Basicrum_Test_Form();
+    $invalidEnabled = new Varien_Data_Form_Element_Abstract('basicrum_analytics_general_enabled', '1');
+    $invalidBeacon = new Varien_Data_Form_Element_Abstract('basicrum_analytics_general_beacon_endpoint', 'ftp://example.test');
+    $invalidSiteId = new Varien_Data_Form_Element_Abstract(
+        'basicrum_analytics_general_brum_site_id',
+        '550e8400-e29b-11d4-a716-446655440000'
+    );
+    $invalidForm->addElement('basicrum_analytics_general_enabled', $invalidEnabled)
+        ->addElement('basicrum_analytics_general_beacon_endpoint', $invalidBeacon)
+        ->addElement('basicrum_analytics_general_brum_site_id', $invalidSiteId);
+
+    $invalidHtml = $renderer->render($invalidBeacon) . $renderer->render($invalidSiteId);
+    basicrum_assert_contains(
+        'Enter a valid HTTP or HTTPS Beacon Endpoint URL',
+        $invalidHtml,
+        'invalid Beacon URL must have field-level guidance'
+    );
+    basicrum_assert_contains(
+        'Enter a valid UUID v4 BasicRUM Site ID',
+        $invalidHtml,
+        'invalid Site ID must have field-level guidance'
     );
 };
 

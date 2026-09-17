@@ -62,10 +62,13 @@ Legend:
 
 ## Validation and state feedback
 
-- [ ] Show a visible incomplete-configuration state when Beacon URL or Brum Site ID
+- [x] Show a visible incomplete-configuration state when Beacon URL or Brum Site ID
   is missing, making clear that monitoring remains disabled.
-- [ ] Add field-level invalid-state feedback comparable to WordPress warnings and
+- [x] Add field-level invalid-state feedback comparable to WordPress warnings and
   inline errors while retaining Magento's server-side validation.
+  - Feedback is shown only when monitoring is enabled, uses the resolved field
+    values at the current configuration scope, and does not replace the backend
+    validation contract.
 - [ ] Disable or hide irrelevant dependent controls when the module is disabled.
 - [x] Reveal Wait After Onload milliseconds only when Wait After Onload is enabled.
 - [ ] Review whether consent-specific controls should be disabled when the module
@@ -109,7 +112,7 @@ Legend:
 - [x] Fix the consent guidance width and wrapping.
 - [x] Conditionally display consent guidance.
 - [x] Use plain-language consent choices.
-- [ ] Add incomplete and invalid configuration feedback.
+- [x] Add incomplete and invalid configuration feedback.
 
 ### P1 — integration parity
 
@@ -132,7 +135,7 @@ Legend:
 - [x] Consent-controlled mode clearly explains what the external consent tool must
   do and shows only relevant instructions.
 - [x] Immediate mode does not display consent-integration instructions.
-- [ ] Required configuration errors are visible at the affected fields.
+- [x] Required configuration errors are visible at the affected fields.
 - [x] Magento configuration scopes continue to work at all supported levels.
 - [ ] Platform-specific differences are documented and intentional.
 - [ ] Updated screenshots match the shipped admin UI.

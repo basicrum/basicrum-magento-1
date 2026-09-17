@@ -6,6 +6,7 @@ app/etc/modules/BasicRum_Analytics.xml                                         a
 
 # Module code files
 app/code/community/BasicRum/Analytics/Block/Adminhtml/System/Config/Form/Field/ConsentInfo.php   app/code/community/BasicRum/Analytics/Block/Adminhtml/System/Config/Form/Field/ConsentInfo.php
+app/code/community/BasicRum/Analytics/Block/Adminhtml/System/Config/Form/Field/RequiredSetting.php app/code/community/BasicRum/Analytics/Block/Adminhtml/System/Config/Form/Field/RequiredSetting.php
 app/code/community/BasicRum/Analytics/Block/Boomerang/Loader.php               app/code/community/BasicRum/Analytics/Block/Boomerang/Loader.php
 app/code/community/BasicRum/Analytics/Helper/Data.php                          app/code/community/BasicRum/Analytics/Helper/Data.php
 app/code/community/BasicRum/Analytics/Helper/PageTypeDetector.php              app/code/community/BasicRum/Analytics/Helper/PageTypeDetector.php

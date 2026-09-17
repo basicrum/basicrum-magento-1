@@ -49,6 +49,13 @@ basicrum_platform_assert(
     'Magento did not resolve the Basicrum admin consent renderer'
 );
 
+$requiredSetting = Mage::app()->getLayout()
+    ->createBlock('basicrum_analytics/adminhtml_system_config_form_field_requiredSetting');
+basicrum_platform_assert(
+    $requiredSetting instanceof BasicRum_Analytics_Block_Adminhtml_System_Config_Form_Field_RequiredSetting,
+    'Magento did not resolve the Basicrum required-setting renderer'
+);
+
 $siteIdBackend = Mage::getModel('basicrum_analytics/system_config_backend_siteId');
 basicrum_platform_assert(
     $siteIdBackend instanceof BasicRum_Analytics_Model_System_Config_Backend_SiteId,

@@ -19,20 +19,99 @@ class Mage_Core_Block_Abstract
 
 class Mage_Adminhtml_Block_System_Config_Form_Field extends Mage_Core_Block_Abstract
 {
+    protected function _getElementHtml(Varien_Data_Form_Element_Abstract $element)
+    {
+        return $element->getElementHtml();
+    }
+
+    public function render(Varien_Data_Form_Element_Abstract $element)
+    {
+        return '<tr id="row_' . $element->getHtmlId() . '"><td class="value">'
+            . $this->_getElementHtml($element)
+            . '</td></tr>';
+    }
+}
+
+class Basicrum_Test_Form
+{
+    private $elements = array();
+
+    public function addElement($id, Varien_Data_Form_Element_Abstract $element)
+    {
+        $this->elements[$id] = $element;
+        $element->setForm($this);
+        return $this;
+    }
+
+    public function getElement($id)
+    {
+        return isset($this->elements[$id]) ? $this->elements[$id] : null;
+    }
 }
 
 class Varien_Data_Form_Element_Abstract
 {
     private $htmlId;
+    private $value;
+    private $form;
+    private $class = 'input-text';
 
-    public function __construct($htmlId)
+    public function __construct($htmlId, $value = '')
     {
         $this->htmlId = $htmlId;
+        $this->value = $value;
     }
 
     public function getHtmlId()
     {
         return $this->htmlId;
+    }
+
+    public function getValue()
+    {
+        return $this->value;
+    }
+
+    public function setValue($value)
+    {
+        $this->value = $value;
+        return $this;
+    }
+
+    public function getForm()
+    {
+        return $this->form;
+    }
+
+    public function setForm($form)
+    {
+        $this->form = $form;
+        return $this;
+    }
+
+    public function getClass()
+    {
+        return $this->class;
+    }
+
+    public function setClass($class)
+    {
+        $this->class = $class;
+        return $this;
+    }
+
+    public function addClass($class)
+    {
+        $this->class = trim($this->class . ' ' . $class);
+        return $this;
+    }
+
+    public function getElementHtml()
+    {
+        return '<input id="' . htmlspecialchars($this->htmlId, ENT_QUOTES, 'UTF-8')
+            . '" class="' . htmlspecialchars($this->class, ENT_QUOTES, 'UTF-8')
+            . '" value="' . htmlspecialchars((string) $this->value, ENT_QUOTES, 'UTF-8')
+            . '" />';
     }
 }
 

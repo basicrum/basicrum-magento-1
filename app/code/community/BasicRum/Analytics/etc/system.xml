@@ -47,6 +47,7 @@
                         <beacon_endpoint translate="label">
                             <label>Beacon Endpoint URL</label>
                             <frontend_type>text</frontend_type>
+                            <frontend_model>basicrum_analytics/adminhtml_system_config_form_field_requiredSetting</frontend_model>
                             <backend_model>basicrum_analytics/system_config_backend_beaconEndpoint</backend_model>
                             <sort_order>2</sort_order>
                             <show_in_default>1</show_in_default>
@@ -57,6 +58,7 @@
                         <brum_site_id translate="label comment">
                             <label>BasicRUM Site ID</label>
                             <frontend_type>text</frontend_type>
+                            <frontend_model>basicrum_analytics/adminhtml_system_config_form_field_requiredSetting</frontend_model>
                             <backend_model>basicrum_analytics/system_config_backend_siteId</backend_model>
                             <sort_order>3</sort_order>
                             <show_in_default>1</show_in_default>

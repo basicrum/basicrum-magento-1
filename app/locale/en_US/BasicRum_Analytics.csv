@@ -14,3 +14,8 @@
 "Developer","Developer"
 "Use Unminified Loaders","Use Unminified Loaders"
 "Enable to load non-minified loader scripts for debugging purposes.","Enable to load non-minified loader scripts for debugging purposes."
+"Beacon Endpoint URL is required while monitoring is enabled. Monitoring remains inactive.","Beacon Endpoint URL is required while monitoring is enabled. Monitoring remains inactive."
+"Enter a valid HTTP or HTTPS Beacon Endpoint URL. Monitoring remains inactive.","Enter a valid HTTP or HTTPS Beacon Endpoint URL. Monitoring remains inactive."
+"BasicRUM Site ID is required while monitoring is enabled. Monitoring remains inactive.","BasicRUM Site ID is required while monitoring is enabled. Monitoring remains inactive."
+"Enter a valid UUID v4 BasicRUM Site ID. Monitoring remains inactive.","Enter a valid UUID v4 BasicRUM Site ID. Monitoring remains inactive."
+"Basicrum monitoring is enabled but inactive. Monitoring scripts are not emitted until both required fields contain valid values.","Basicrum monitoring is enabled but inactive. Monitoring scripts are not emitted until both required fields contain valid values."
