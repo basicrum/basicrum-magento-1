@@ -1,0 +1,47 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  php:
+    name: PHP ${{ matrix.php }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        php: ["7.4", "8.3"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          coverage: none
+      - name: PHP syntax
+        run: find app tests/php -type f -name '*.php' -print0 | xargs -0 -n1 php -l
+      - name: PHP configuration and rendering tests
+        run: php tests/php/run.php
+
+  browser-and-package:
+    name: Browser and package checks
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - name: Install JavaScript dependencies
+        run: npm ci
+      - name: Install Chromium
+        run: npx playwright install --with-deps chromium
+      - name: Browser loader tests
+        run: npm test
+      - name: Install XML and archive tools
+        run: sudo apt-get update && sudo apt-get install -y libxml2-utils zip unzip
+      - name: XML and package checks
+        run: bash tests/check-package.sh
