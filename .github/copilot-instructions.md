@@ -5,14 +5,14 @@ This module integrates **Boomerang.js** (Real User Monitoring) into Magento 1 st
 
 ### Key Features
 - **RUM Data Collection**: Captures page load timing, resource timing, and continuity metrics.
-- **GDPR/Privacy Compliance**: Supports opt-in mode for cookie consent requirements.
+- **GDPR/Privacy Compliance**: Uses consent-controlled loading by default for new installations.
 - **Configurable Beacon Endpoint**: Admin can specify where analytics data is sent.
 - **Async Loading**: Boomerang JS loads asynchronously to minimize performance impact.
 
 ## Project Context
 - **Framework**: Magento 1 (OpenMage LTS) / Modernized M1.
 - **Module Name**: `BasicRum_Analytics`
-- **Module Version**: `1.0.0`
+- **Module Version**: `1.1.0`
 - **Code Pool**: `community`
 - **Deployment**: Uses `modman` for file mapping.
 
@@ -33,7 +33,7 @@ This module integrates **Boomerang.js** (Real User Monitoring) into Magento 1 st
 app/code/community/BasicRum/Analytics/
 ├── Block/
 │   └── Boomerang/
-│       └── Loader.php              # Renders JS snippet in footer
+│       └── Loader.php              # Renders JS snippet before the closing body tag
 ├── Helper/
 │   ├── Data.php                    # Config retrieval methods
 │   └── PageTypeDetector.php        # Layout handle-based page type detection
@@ -56,7 +56,7 @@ js/basicrum/
 
 | Class | Purpose |
 |-------|---------|
-| `BasicRum_Analytics_Block_Boomerang_Loader` | Generates the Boomerang JS inline script. Injected into `footer` reference. |
+| `BasicRum_Analytics_Block_Boomerang_Loader` | Generates the Boomerang JS inline script. Injected into the `before_body_end` reference. |
 | `BasicRum_Analytics_Helper_Data` | Retrieves admin config values: `isEnabled()`, `isOptInRequired()`, `getBeaconEndpoint()`, `useUnminifiedLoaders()`. |
 | `BasicRum_Analytics_Helper_PageTypeDetector` | Detects page type from layout handles (home, product, category, etc.). |
 
@@ -66,14 +66,15 @@ Access via `Mage::getStoreConfig()` or `Mage::getStoreConfigFlag()`:
 | Path | Type | Description |
 |------|------|-------------|
 | `basicrum_analytics/general/enabled` | bool | Enable/disable the module |
-| `basicrum_analytics/general/opt_in_required` | bool | Use opt-in loader for GDPR compliance |
+| `basicrum_analytics/privacy/opt_in_required` | bool | Require a current-page opt-in signal before loading |
 | `basicrum_analytics/general/beacon_endpoint` | string | URL where beacons are sent |
+| `basicrum_analytics/general/brum_site_id` | string | Required Basicrum backend UUID v4 |
 | `basicrum_analytics/wait_after_onload/enabled` | bool | Enable delayed beacon sending |
 | `basicrum_analytics/wait_after_onload/wait_ms` | int | Milliseconds to wait before sending beacon |
 | `basicrum_analytics/developer/use_unminified_loaders` | bool | Load non-minified JS for debugging |
 
 ### JavaScript Assets
-Located in `js/basicrum/` and symlinked to Magento's `public/js/basicrum/`:
+Located in `js/basicrum/` and mapped by Modman to Magento's root-level `js/basicrum/` directory:
 
 | File | Purpose |
 |------|---------|
@@ -84,9 +85,9 @@ Located in `js/basicrum/` and symlinked to Magento's `public/js/basicrum/`:
 | `loaders/consent-boomerang-loader-v1-15.js` | GDPR-compliant loader (development) |
 
 ### Layout Integration
-The block is added to the `footer` reference in `basicrum_analytics.xml`:
+The block is added to the `before_body_end` reference in `basicrum_analytics.xml`:
 ```xml
-<reference name="footer">
+<reference name="before_body_end">
     <block type="basicrum_analytics/boomerang_loader" name="boomerang" />
 </reference>
 ```
@@ -94,7 +95,7 @@ The block is added to the `footer` reference in `basicrum_analytics.xml`:
 ## Specific Instructions
 1. **Modman**: When adding new files, always verify if the `modman` file needs updating to map the file from the source to the Magento root.
 2. **Layouts**: Layout updates reside in `app/design/frontend/base/default/layout/`.
-3. **JS/CSS**: Static assets are symlinked from `js/basicrum/` to the Magento root `public/js/` folder.
+3. **JavaScript**: Static assets under `js/basicrum/` are mapped by Modman to the Magento root `js/basicrum/` directory.
 4. **Configuration**:
    - `config.xml`: Module version, models, blocks, helpers, events.
    - `system.xml`: Backend configuration fields (ACL, Scope).
@@ -111,7 +112,7 @@ The block is added to the `footer` reference in `basicrum_analytics.xml`:
 ## Boomerang Configuration
 The module configures Boomerang with these settings:
 - `beacon_url`: From admin config.
-- `instrument_xhr`: Enabled for XHR tracking.
+- `instrument_xhr`: Disabled.
 - `Continuity.enabled`: Tracks user interaction metrics.
 - `ResourceTiming.enabled`: Captures resource load times.
 - `secure_cookie` & `same_site_cookie`: Set to `true` and `"Strict"` for security.
