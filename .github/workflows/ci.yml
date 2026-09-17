@@ -22,7 +22,7 @@ jobs:
           php-version: ${{ matrix.php }}
           coverage: none
       - name: PHP syntax
-        run: find app tests/php -type f -name '*.php' -print0 | xargs -0 -n1 php -l
+        run: find app tests/php tests/platform -type f -name '*.php' -print0 | xargs -0 -n1 php -l
       - name: PHP configuration and rendering tests
         run: php tests/php/run.php
 
