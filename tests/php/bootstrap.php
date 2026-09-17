@@ -17,6 +17,25 @@ class Mage_Core_Block_Abstract
 {
 }
 
+class Mage_Adminhtml_Block_System_Config_Form_Field extends Mage_Core_Block_Abstract
+{
+}
+
+class Varien_Data_Form_Element_Abstract
+{
+    private $htmlId;
+
+    public function __construct($htmlId)
+    {
+        $this->htmlId = $htmlId;
+    }
+
+    public function getHtmlId()
+    {
+        return $this->htmlId;
+    }
+}
+
 class Mage_Core_Model_Config_Data
 {
     private $value;

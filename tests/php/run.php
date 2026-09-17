@@ -9,6 +9,8 @@ require $root . '/app/code/community/BasicRum/Analytics/Block/Boomerang/Loader.p
 require $root . '/app/code/community/BasicRum/Analytics/Model/System/Config/Backend/SiteId.php';
 require $root . '/app/code/community/BasicRum/Analytics/Model/System/Config/Backend/BeaconEndpoint.php';
 require $root . '/app/code/community/BasicRum/Analytics/Model/Setup/PrivacyDefault.php';
+require $root . '/app/code/community/BasicRum/Analytics/Model/System/Config/Source/ConsentMode.php';
+require $root . '/app/code/community/BasicRum/Analytics/Block/Adminhtml/System/Config/Form/Field/ConsentInfo.php';
 
 class Basicrum_Test_SiteIdBackend extends BasicRum_Analytics_Model_System_Config_Backend_SiteId
 {
@@ -27,6 +29,58 @@ class Basicrum_Test_BeaconBackend extends BasicRum_Analytics_Model_System_Config
 }
 
 $tests = array();
+
+$tests['admin consent choices preserve values and explain behavior'] = function () {
+    basicrum_test_reset();
+
+    $options = (new BasicRum_Analytics_Model_System_Config_Source_ConsentMode())->toOptionArray();
+
+    basicrum_assert_same('0', $options[0]['value'], 'immediate mode must retain its stored value');
+    basicrum_assert_contains(
+        'Monitor without consent',
+        $options[0]['label'],
+        'immediate mode must explain that consent is not required'
+    );
+    basicrum_assert_same('1', $options[1]['value'], 'consent-controlled mode must retain its stored value');
+    basicrum_assert_contains(
+        'Require consent before monitoring',
+        $options[1]['label'],
+        'consent-controlled mode must explain that monitoring waits for consent'
+    );
+};
+
+$tests['admin consent guidance is a full-width dependent row'] = function () use ($root) {
+    $elementId = 'basicrum_analytics_privacy_consent_integration_info';
+    $renderer = new BasicRum_Analytics_Block_Adminhtml_System_Config_Form_Field_ConsentInfo();
+    $html = $renderer->render(new Varien_Data_Form_Element_Abstract($elementId));
+
+    basicrum_assert_contains('id="row_' . $elementId . '"', $html, 'guidance row must use Magento field row ID');
+    basicrum_assert_contains('colspan="4"', $html, 'guidance must span the configuration table');
+    basicrum_assert_contains(
+        'OPT_IN_BASICRUM_LOADER_WRAPPER()',
+        $html,
+        'guidance must retain the canonical opt-in callback'
+    );
+    basicrum_assert_contains(
+        'OPT_IN_BASIC_RUM()',
+        $html,
+        'guidance must retain the legacy Magento callback alias'
+    );
+
+    $xml = simplexml_load_file($root . '/app/code/community/BasicRum/Analytics/etc/system.xml');
+    basicrum_assert_true($xml !== false, 'system configuration XML must parse');
+    $privacyFields = $xml->sections->basicrum_analytics->groups->privacy->fields;
+    basicrum_assert_same(
+        'basicrum_analytics/system_config_source_consentMode',
+        (string) $privacyFields->opt_in_required->source_model,
+        'consent control must use the plain-language source model'
+    );
+    basicrum_assert_same(
+        '1',
+        (string) $privacyFields->consent_integration_info->depends->opt_in_required,
+        'guidance must depend on consent-controlled mode'
+    );
+};
 
 $tests['runtime validation follows the backend contract'] = function () {
     basicrum_assert_true(

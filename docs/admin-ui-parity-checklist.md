@@ -36,14 +36,17 @@ Legend:
 
 ## Consent and privacy experience
 
-- [ ] Replace the Magento `Yes`/`No` consent choice with labels that explain the
+- [x] Replace the Magento `Yes`/`No` consent choice with labels that explain the
   consequences, equivalent to WordPress's “Monitor without consent” and “Require
   consent before monitoring” choices.
-- [ ] Make the Magento consent integration guidance use the available content
-  width. It is currently constrained to the narrow field value column, which
-  causes excessive wrapping and leaves most of the page empty.
-- [ ] Hide the consent integration guidance when consent-controlled monitoring is
-  disabled. It currently remains visible after selecting `No`.
+- [x] Make the Magento consent integration guidance use the available content
+  width.
+  - Implemented as a separate full-width configuration row so the instructions
+    remain readable in Magento's native table layout.
+- [x] Hide the consent integration guidance when consent-controlled monitoring is
+  disabled.
+  - Implemented with Magento's native field dependency mechanism, including
+    inherited Website and Store View configuration.
 - [ ] Add an explicit Automatic/Manual consent integration choice, or document an
   intentional decision that Magento remains manual-only.
 - [ ] If automatic integration is added, show the active provider, detected
@@ -103,9 +106,9 @@ Legend:
 
 ### P0 — consent clarity and configuration safety
 
-- [ ] Fix the consent guidance width and wrapping.
-- [ ] Conditionally display consent guidance.
-- [ ] Use plain-language consent choices.
+- [x] Fix the consent guidance width and wrapping.
+- [x] Conditionally display consent guidance.
+- [x] Use plain-language consent choices.
 - [ ] Add incomplete and invalid configuration feedback.
 
 ### P1 — integration parity
@@ -126,10 +129,10 @@ Legend:
 
 - [ ] A new administrator can tell whether monitoring is active, inactive, or
   blocked by incomplete configuration without reading source code.
-- [ ] Consent-controlled mode clearly explains what the external consent tool must
+- [x] Consent-controlled mode clearly explains what the external consent tool must
   do and shows only relevant instructions.
-- [ ] Immediate mode does not display consent-integration instructions.
+- [x] Immediate mode does not display consent-integration instructions.
 - [ ] Required configuration errors are visible at the affected fields.
-- [ ] Magento configuration scopes continue to work at all supported levels.
+- [x] Magento configuration scopes continue to work at all supported levels.
 - [ ] Platform-specific differences are documented and intentional.
 - [ ] Updated screenshots match the shipped admin UI.

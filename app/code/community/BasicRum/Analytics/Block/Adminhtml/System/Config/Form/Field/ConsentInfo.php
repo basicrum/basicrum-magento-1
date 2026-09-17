@@ -17,17 +17,19 @@ class BasicRum_Analytics_Block_Adminhtml_System_Config_Form_Field_ConsentInfo
     extends Mage_Adminhtml_Block_System_Config_Form_Field
 {
     /**
-     * Render the field with consent integration guidance.
+     * Render consent guidance as a full-width configuration row.
      *
      * @param Varien_Data_Form_Element_Abstract $element
      * @return string
      */
-    protected function _getElementHtml(Varien_Data_Form_Element_Abstract $element): string
+    public function render(Varien_Data_Form_Element_Abstract $element): string
     {
-        $html = parent::_getElementHtml($element);
+        $rowId = htmlspecialchars('row_' . $element->getHtmlId(), ENT_QUOTES, 'UTF-8');
 
-        $infoHtml = <<<HTML
-<div style="margin-top: 10px; padding: 12px 15px; background: #f8f8f8; border-left: 4px solid #eb5202; border-radius: 3px;">
+        return <<<HTML
+<tr id="{$rowId}">
+<td colspan="4" style="padding: 0 15px 10px;">
+<div style="box-sizing: border-box; width: 100%; padding: 12px 15px; background: #f8f8f8; border-left: 4px solid #eb5202; border-radius: 3px;">
     <div style="font-weight: bold; margin-bottom: 8px; color: #333;">JavaScript API for Cookie Consent Integration</div>
     <p style="color: #555;">In consent-controlled mode, Basicrum stays inert until your external consent tool explicitly allows performance monitoring on the current page. Basicrum does not store or infer a consent decision. Call the API after this loader has registered the callbacks near the end of the page; calls made before registration are not replayed.</p>
     <table style="margin: 10px 0; border-collapse: collapse;">
@@ -51,8 +53,8 @@ if (typeof window.OPT_OUT_BASICRUM_LOADER_WRAPPER === 'function') {
 }</pre>
     </div>
 </div>
+</td>
+</tr>
 HTML;
-
-        return $html . $infoHtml;
     }
 }

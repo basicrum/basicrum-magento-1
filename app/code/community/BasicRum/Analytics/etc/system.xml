@@ -77,14 +77,24 @@
                         <opt_in_required translate="label">
                             <label>Require Consent Before Monitoring</label>
                             <frontend_type>select</frontend_type>
-                            <frontend_model>basicrum_analytics/adminhtml_system_config_form_field_consentInfo</frontend_model>
-                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <source_model>basicrum_analytics/system_config_source_consentMode</source_model>
                             <sort_order>1</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
-                            <comment>Recommended. Monitoring remains off until the external consent tool explicitly allows it on each page.</comment>
+                            <comment>Choose whether Basicrum may begin monitoring immediately or must wait for explicit consent on each page.</comment>
                         </opt_in_required>
+                        <consent_integration_info>
+                            <frontend_type>note</frontend_type>
+                            <frontend_model>basicrum_analytics/adminhtml_system_config_form_field_consentInfo</frontend_model>
+                            <sort_order>2</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <depends>
+                                <opt_in_required>1</opt_in_required>
+                            </depends>
+                        </consent_integration_info>
                     </fields>
                 </privacy>
                 <wait_after_onload translate="label">
