@@ -31,6 +31,16 @@ class BasicRum_Analytics_Helper_Data extends Mage_Core_Helper_Abstract
     }
 
     /**
+     * Check whether Boomerang should redact URL query strings.
+     *
+     * @return bool
+     */
+    public function shouldStripQueryString(): bool
+    {
+        return Mage::getStoreConfigFlag('basicrum_analytics/privacy/strip_query_string');
+    }
+
+    /**
      * Get beacon endpoint URL
      * @return string|null
      */

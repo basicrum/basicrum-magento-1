@@ -340,6 +340,7 @@ function basicrum_test_reset(array $overrides = array())
         'basicrum_analytics/general/enabled' => '1',
         'basicrum_analytics/general/beacon_endpoint' => 'https://collector.example.test/beacon',
         'basicrum_analytics/general/brum_site_id' => 'e926c1a2-7e33-4f54-90d0-e6e31f3ad43d',
+        'basicrum_analytics/privacy/strip_query_string' => '0',
         'basicrum_analytics/privacy/opt_in_required' => '0',
         'basicrum_analytics/wait_after_onload/enabled' => '0',
         'basicrum_analytics/wait_after_onload/wait_ms' => '0',

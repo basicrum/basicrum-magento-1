@@ -137,6 +137,16 @@ $tests['admin consent guidance is a full-width dependent row'] = function () use
         (string) $privacyFields->consent_integration_info->depends->opt_in_required,
         'guidance must depend on consent-controlled mode'
     );
+    basicrum_assert_same(
+        'adminhtml/system_config_source_yesno',
+        (string) $privacyFields->strip_query_string->source_model,
+        'query-string privacy must use a scoped Magento Yes/No control'
+    );
+    basicrum_assert_contains(
+        '?qs-redacted',
+        (string) $privacyFields->strip_query_string->comment,
+        'query-string privacy guidance must name the redaction marker'
+    );
 };
 
 $tests['enabled incomplete configuration is visibly inactive'] = function () use ($root) {
@@ -309,6 +319,12 @@ $tests['helper normalizes secure URLs and wait milliseconds'] = function () {
         'secure pages must upgrade the Beacon URL'
     );
     basicrum_assert_same(30000, $helper->getWaitAfterOnloadMilliseconds(), 'wait value must be capped');
+    basicrum_assert_same(false, $helper->shouldStripQueryString(), 'query stripping must remain disabled by default');
+
+    list($privacyHelper) = basicrum_test_reset(array(
+        'basicrum_analytics/privacy/strip_query_string' => '1',
+    ));
+    basicrum_assert_same(true, $privacyHelper->shouldStripQueryString(), 'query stripping must honor scoped config');
 };
 
 $tests['backend models trim and validate configuration'] = function () {
@@ -371,6 +387,21 @@ $tests['valid immediate and consent configurations select the expected loader'] 
     basicrum_assert_not_contains('consent-boomerang-loader', $immediate, 'immediate mode must not use consent loader');
     basicrum_assert_contains('brum_site_id', $immediate, 'Site ID must be rendered');
     basicrum_assert_contains('beacon_url', $immediate, 'Beacon URL must be rendered');
+    basicrum_assert_contains(
+        '"strip_query_string":false',
+        $immediate,
+        'query strings must remain unchanged by default for compatibility'
+    );
+
+    basicrum_test_reset(array(
+        'basicrum_analytics/privacy/strip_query_string' => '1',
+    ));
+    $redacted = $block->getBoomerangSnippet();
+    basicrum_assert_contains(
+        '"strip_query_string":true',
+        $redacted,
+        'enabled query-string privacy must reach Boomerang as a boolean'
+    );
 
     basicrum_test_reset(array(
         'basicrum_analytics/privacy/opt_in_required' => '1',

@@ -65,8 +65,9 @@ Legend:
 - [x] Explain that Basicrum does not persist or infer consent.
 - [x] Explain cookie removal and that data already sent cannot be retracted.
 - [x] Explain safe re-grant behavior after withdrawal.
-- [ ] Add a Strip Query Strings privacy setting or record a deliberate reason not
-  to expose it on Magento 1.
+- [x] Add a Strip Query Strings privacy setting.
+  - It uses Boomerang's native `strip_query_string` option, remains disabled by
+    default for compatibility, and preserves query parameters in the Beacon URL.
 
 ## Validation and state feedback
 

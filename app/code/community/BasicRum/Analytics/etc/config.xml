@@ -63,6 +63,7 @@
                 <brum_site_id></brum_site_id>
             </general>
             <privacy>
+                <strip_query_string>0</strip_query_string>
                 <opt_in_required>1</opt_in_required>
             </privacy>
             <wait_after_onload>

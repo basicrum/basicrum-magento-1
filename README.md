@@ -42,6 +42,12 @@ Monitoring scripts are emitted only when all of these conditions are met:
 
 Both identity values are mandatory. Runtime validation is performed again when rendering, so missing, malformed, or programmatically injected values fail closed even if they bypass the admin backend models. Dynamic JavaScript values are JSON encoded with HTML-significant characters escaped.
 
+### Query-string privacy
+
+**Strip Query Strings** controls Boomerang's native URL redaction. It remains disabled by default to preserve the established Magento 1 behavior and match the WordPress default. When enabled, complete query strings in page, navigation, referrer, and resource URLs are replaced with `?qs-redacted` before beacons are sent; URL paths remain available for performance analysis.
+
+This setting does not modify query parameters in the configured Beacon Endpoint URL. Those parameters are part of the collector destination and continue to be safely serialized unchanged.
+
 ### Consent-controlled loading
 
 **Require Consent Before Monitoring** is the privacy-first default for new installations. In this mode the loader remains inert until an external consent tool explicitly calls the opt-in callback on the current page:

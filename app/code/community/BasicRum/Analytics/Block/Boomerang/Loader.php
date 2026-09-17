@@ -60,6 +60,7 @@ class BasicRum_Analytics_Block_Boomerang_Loader extends Mage_Core_Block_Abstract
         $configJs = json_encode([
             'beacon_url' => $beaconEndpoint,
             'instrument_xhr' => false,
+            'strip_query_string' => $helper->shouldStripQueryString(),
             'Continuity' => [
                 'enabled' => true
             ],

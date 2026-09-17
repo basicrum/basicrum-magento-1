@@ -18,6 +18,7 @@ basicrum_platform_save(array(
     'basicrum_analytics/general/enabled' => $mode === 'disabled' ? '0' : '1',
     'basicrum_analytics/general/beacon_endpoint' => 'https://collector.example.test/beacon',
     'basicrum_analytics/general/brum_site_id' => '550e8400-e29b-41d4-a716-446655440000',
+    'basicrum_analytics/privacy/strip_query_string' => '0',
     'basicrum_analytics/privacy/opt_in_required' => $mode === 'consent' ? '1' : '0',
     'basicrum_analytics/developer/use_unminified_loaders' => '0',
 ));

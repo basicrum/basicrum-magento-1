@@ -75,6 +75,7 @@ basicrum_platform_save(array(
     'basicrum_analytics/general/enabled' => '1',
     'basicrum_analytics/general/beacon_endpoint' => 'https://collector.example.test/beacon',
     'basicrum_analytics/general/brum_site_id' => '550e8400-e29b-41d4-a716-446655440000',
+    'basicrum_analytics/privacy/strip_query_string' => '1',
     'basicrum_analytics/privacy/opt_in_required' => '0',
     'basicrum_analytics/wait_after_onload/enabled' => '1',
     'basicrum_analytics/wait_after_onload/wait_ms' => '90000',
@@ -96,6 +97,10 @@ basicrum_platform_assert(
 basicrum_platform_assert(
     strpos($immediate, '}.bind(this), 30000);') !== false,
     'wait-after-onload value was not capped at 30 seconds'
+);
+basicrum_platform_assert(
+    strpos($immediate, '"strip_query_string":true') !== false,
+    'query-string privacy setting did not reach the native rendered configuration'
 );
 
 basicrum_platform_save(array(

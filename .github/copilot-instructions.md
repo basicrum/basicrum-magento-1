@@ -67,6 +67,7 @@ Access via `Mage::getStoreConfig()` or `Mage::getStoreConfigFlag()`:
 |------|------|-------------|
 | `basicrum_analytics/general/enabled` | bool | Enable/disable the module |
 | `basicrum_analytics/privacy/opt_in_required` | bool | Require a current-page opt-in signal before loading |
+| `basicrum_analytics/privacy/strip_query_string` | bool | Redact query strings in monitored URLs before beaconing |
 | `basicrum_analytics/general/beacon_endpoint` | string | URL where beacons are sent |
 | `basicrum_analytics/general/brum_site_id` | string | Required Basicrum backend UUID v4 |
 | `basicrum_analytics/wait_after_onload/enabled` | bool | Enable delayed beacon sending |
@@ -113,6 +114,7 @@ The block is added to the `before_body_end` reference in `basicrum_analytics.xml
 The module configures Boomerang with these settings:
 - `beacon_url`: From admin config.
 - `instrument_xhr`: Disabled.
+- `strip_query_string`: Scoped privacy setting; disabled by default for compatibility.
 - `Continuity.enabled`: Tracks user interaction metrics.
 - `ResourceTiming.enabled`: Captures resource load times.
 - `secure_cookie` & `same_site_cookie`: Set to `true` and `"Strict"` for security.
