@@ -85,8 +85,12 @@ bash "$plugin_root/tests/platform/verify-live.sh" "$platform" "$platform_root"
 
 php "$plugin_root/tests/platform/prepare-upgrade.php" "$platform_root" "$platform" legacy
 bash "$plugin_root/tests/platform/apply-upgrade.sh" "$platform" "$platform_root"
-php "$plugin_root/tests/platform/verify-upgrade.php" "$platform_root" "$platform" legacy 0
+php "$plugin_root/tests/platform/verify-upgrade.php" "$platform_root" "$platform" legacy 0 absent
 
 php "$plugin_root/tests/platform/prepare-upgrade.php" "$platform_root" "$platform" explicit
 bash "$plugin_root/tests/platform/apply-upgrade.sh" "$platform" "$platform_root"
-php "$plugin_root/tests/platform/verify-upgrade.php" "$platform_root" "$platform" explicit 1
+php "$plugin_root/tests/platform/verify-upgrade.php" "$platform_root" "$platform" explicit 1 absent
+
+php "$plugin_root/tests/platform/prepare-upgrade.php" "$platform_root" "$platform" http
+bash "$plugin_root/tests/platform/apply-upgrade.sh" "$platform" "$platform_root"
+php "$plugin_root/tests/platform/verify-upgrade.php" "$platform_root" "$platform" http 0 1

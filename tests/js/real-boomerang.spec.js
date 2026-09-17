@@ -16,19 +16,25 @@ function loaderPath(file) {
   return path.join(root, "js/basicrum/loaders", file);
 }
 
-async function prepareRealPage(page) {
+async function prepareRealPage(page, options = {}) {
   let releaseDownload;
   let markDownloadStarted;
   let beaconRequests = 0;
+  const beaconRequestData = [];
+  const pageUrl = options.pageUrl || shopUrl;
   const downloadGate = new Promise((resolve) => { releaseDownload = resolve; });
   const downloadStarted = new Promise((resolve) => { markDownloadStarted = resolve; });
 
-  await page.route(shopUrl, (route) => route.fulfill({
+  await page.route(`${shopUrl}*`, (route) => route.fulfill({
     contentType: "text/html",
     body: "<!doctype html><html><head></head><body></body></html>"
   }));
   await page.route(`${beaconUrl}*`, (route) => {
     beaconRequests += 1;
+    beaconRequestData.push({
+      url: route.request().url(),
+      postData: route.request().postData()
+    });
     return route.fulfill({
       status: 204,
       headers: { "access-control-allow-origin": "*" },
@@ -45,22 +51,28 @@ async function prepareRealPage(page) {
     });
   });
 
-  await page.goto(shopUrl);
-  await page.evaluate(({ bundleUrl, collectorUrl }) => {
+  await page.goto(pageUrl);
+  await page.evaluate(({ bundleUrl, collectorUrl, stripQueryString }) => {
     window.BOOMR = { url: bundleUrl };
     window.basicRumBoomerangConfig = {
       beacon_url: collectorUrl,
       instrument_xhr: false,
+      strip_query_string: stripQueryString,
       Continuity: { enabled: true },
       secure_cookie: false,
       same_site_cookie: "Strict"
     };
-  }, { bundleUrl: boomerangUrl, collectorUrl: beaconUrl });
+  }, {
+    bundleUrl: boomerangUrl,
+    collectorUrl: beaconUrl,
+    stripQueryString: Boolean(options.stripQueryString)
+  });
 
   return {
     downloadStarted,
     releaseDownload,
-    beaconRequests: () => beaconRequests
+    beaconRequests: () => beaconRequests,
+    beaconRequestData: () => beaconRequestData
   };
 }
 
@@ -69,6 +81,26 @@ async function waitForRealBoomerang(page) {
     () => page.evaluate(() => window.BOOMR && window.BOOMR.version)
   ).toBe("1.815.60");
 }
+
+test("real Boomerang redacts the monitored page query string when enabled", async ({ page }) => {
+  const gate = await prepareRealPage(page, {
+    pageUrl: `${shopUrl}?customer=private-value&campaign=test`,
+    stripQueryString: true
+  });
+
+  await page.addScriptTag({ path: loaderPath("boomerang-loader-v15.js") });
+  await gate.downloadStarted;
+  gate.releaseDownload();
+  await waitForRealBoomerang(page);
+  await expect.poll(() => gate.beaconRequests(), { timeout: 10000 }).toBeGreaterThan(0);
+
+  const request = gate.beaconRequestData()[0];
+  const parameters = request.postData
+    ? new URLSearchParams(request.postData)
+    : new URL(request.url).searchParams;
+  expect(parameters.get("u")).toBe(`${shopUrl}?qs-redacted`);
+  expect(`${request.url}${request.postData || ""}`).not.toContain("private-value");
+});
 
 for (const consentLoader of [
   "consent-boomerang-loader-v1-15.js",

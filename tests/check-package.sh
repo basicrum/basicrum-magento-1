@@ -10,9 +10,12 @@ done < <(find app -type f -name '*.xml' -print | sort)
 
 module_version="$(xmllint --xpath 'string(/config/modules/BasicRum_Analytics/version)' app/code/community/BasicRum/Analytics/etc/config.xml)"
 privacy_default="$(xmllint --xpath 'string(/config/default/basicrum_analytics/privacy/opt_in_required)' app/code/community/BasicRum/Analytics/etc/config.xml)"
+strip_query_default="$(xmllint --xpath 'string(/config/default/basicrum_analytics/privacy/strip_query_string)' app/code/community/BasicRum/Analytics/etc/config.xml)"
+http_policy_default="$(xmllint --xpath 'string(/config/default/basicrum_analytics/developer/development_mode)' app/code/community/BasicRum/Analytics/etc/config.xml)"
 
-if [[ "$module_version" != "1.1.0" || "$privacy_default" != "1" ]]; then
-    echo "Unexpected module version or privacy default: version=$module_version opt_in_required=$privacy_default" >&2
+if [[ "$module_version" != "1.1.0" || "$privacy_default" != "1" \
+    || "$strip_query_default" != "0" || "$http_policy_default" != "0" ]]; then
+    echo "Unexpected module or policy defaults: version=$module_version opt_in_required=$privacy_default strip_query_string=$strip_query_default development_mode=$http_policy_default" >&2
     exit 1
 fi
 

@@ -8,8 +8,10 @@ require $root . '/app/code/community/BasicRum/Analytics/Helper/Data.php';
 require $root . '/app/code/community/BasicRum/Analytics/Block/Boomerang/Loader.php';
 require $root . '/app/code/community/BasicRum/Analytics/Model/System/Config/Backend/SiteId.php';
 require $root . '/app/code/community/BasicRum/Analytics/Model/System/Config/Backend/BeaconEndpoint.php';
+require $root . '/app/code/community/BasicRum/Analytics/Model/Setup/HttpPolicyDefault.php';
 require $root . '/app/code/community/BasicRum/Analytics/Model/Setup/PrivacyDefault.php';
 require $root . '/app/code/community/BasicRum/Analytics/Model/System/Config/Source/ConsentMode.php';
+require $root . '/app/code/community/BasicRum/Analytics/Model/System/Config/Source/HttpPolicy.php';
 require $root . '/app/code/community/BasicRum/Analytics/Block/Adminhtml/System/Config/Form/Field/ConsentInfo.php';
 require $root . '/app/code/community/BasicRum/Analytics/Block/Adminhtml/System/Config/Form/Field/RequiredSetting.php';
 
@@ -48,6 +50,17 @@ $tests['admin consent choices preserve values and explain behavior'] = function 
         $options[1]['label'],
         'consent-controlled mode must explain that monitoring waits for consent'
     );
+};
+
+$tests['admin HTTP policy choices explain production and development behavior'] = function () {
+    basicrum_test_reset();
+
+    $options = (new BasicRum_Analytics_Model_System_Config_Source_HttpPolicy())->toOptionArray();
+
+    basicrum_assert_same('0', $options[0]['value'], 'HTTPS enforcement must retain its stored value');
+    basicrum_assert_contains('Require HTTPS', $options[0]['label'], 'the safe policy must explain HTTPS enforcement');
+    basicrum_assert_same('1', $options[1]['value'], 'development HTTP mode must retain its stored value');
+    basicrum_assert_contains('local testing', $options[1]['label'], 'HTTP mode must be limited to local testing');
 };
 
 $tests['admin consent guidance is a full-width dependent row'] = function () use ($root) {
@@ -146,6 +159,11 @@ $tests['admin consent guidance is a full-width dependent row'] = function () use
         '?qs-redacted',
         (string) $privacyFields->strip_query_string->comment,
         'query-string privacy guidance must name the redaction marker'
+    );
+    basicrum_assert_same(
+        'basicrum_analytics/system_config_source_httpPolicy',
+        (string) $xml->sections->basicrum_analytics->groups->developer->fields->development_mode->source_model,
+        'HTTP policy must use plain-language choices'
     );
 };
 
@@ -306,17 +324,16 @@ $tests['runtime validation follows the backend contract'] = function () {
     );
 };
 
-$tests['helper normalizes secure URLs and wait milliseconds'] = function () {
+$tests['helper enforces the HTTP policy and normalizes wait milliseconds'] = function () {
     list($helper) = basicrum_test_reset(array(
         'basicrum_analytics/general/beacon_endpoint' => 'http://collector.example.test/beacon',
         'basicrum_analytics/wait_after_onload/wait_ms' => '90000',
     ));
-    Mage::$app->request->secure = true;
 
     basicrum_assert_same(
         'https://collector.example.test/beacon',
         $helper->getBeaconEndpoint(),
-        'secure pages must upgrade the Beacon URL'
+        'strict mode must upgrade the Beacon URL even on an HTTP storefront'
     );
     basicrum_assert_same(30000, $helper->getWaitAfterOnloadMilliseconds(), 'wait value must be capped');
     basicrum_assert_same(false, $helper->shouldStripQueryString(), 'query stripping must remain disabled by default');
@@ -325,6 +342,16 @@ $tests['helper normalizes secure URLs and wait milliseconds'] = function () {
         'basicrum_analytics/privacy/strip_query_string' => '1',
     ));
     basicrum_assert_same(true, $privacyHelper->shouldStripQueryString(), 'query stripping must honor scoped config');
+
+    list($developmentHelper) = basicrum_test_reset(array(
+        'basicrum_analytics/general/beacon_endpoint' => 'http://127.0.0.1:8080/beacon?site=one',
+        'basicrum_analytics/developer/development_mode' => '1',
+    ));
+    basicrum_assert_same(
+        'http://127.0.0.1:8080/beacon?site=one',
+        $developmentHelper->getBeaconEndpoint(),
+        'development mode must retain an explicitly configured HTTP Beacon URL'
+    );
 };
 
 $tests['backend models trim and validate configuration'] = function () {
@@ -349,6 +376,29 @@ $tests['backend models trim and validate configuration'] = function () {
         'https://collector.example.test/beacon',
         $beacon->getValue(),
         'Beacon backend must trim a valid URL'
+    );
+
+    $strictBeacon = new Basicrum_Test_BeaconBackend();
+    $strictBeacon->setValue('http://collector.example.test/beacon?site=one')->validate();
+    basicrum_assert_same(
+        'https://collector.example.test/beacon?site=one',
+        $strictBeacon->getValue(),
+        'Beacon backend must upgrade HTTP while strict mode is selected'
+    );
+
+    $developmentBeacon = new Basicrum_Test_BeaconBackend();
+    $developmentBeacon->setGroups(array(
+        'developer' => array(
+            'fields' => array(
+                'development_mode' => array('value' => '1'),
+            ),
+        ),
+    ));
+    $developmentBeacon->setValue('http://127.0.0.1:8080/beacon')->validate();
+    basicrum_assert_same(
+        'http://127.0.0.1:8080/beacon',
+        $developmentBeacon->getValue(),
+        'Beacon backend must honor development mode submitted on the same form'
     );
 
     basicrum_assert_throws(function () {
@@ -464,18 +514,47 @@ $tests['privacy default migration distinguishes new installs and upgrades'] = fu
     );
 };
 
-$tests['privacy default installer persists the versioned decision through Magento APIs'] = function () use ($root) {
+$tests['HTTP policy migration preserves each explicit Beacon URL scope'] = function () {
+    $policies = BasicRum_Analytics_Model_Setup_HttpPolicyDefault::getValuesToPersist(
+        array(
+            array('scope' => 'default', 'scope_id' => '0', 'value' => 'http://collector.example.test/beacon'),
+            array('scope' => 'websites', 'scope_id' => '2', 'value' => 'https://collector.example.test/beacon'),
+            array('scope' => 'stores', 'scope_id' => '3', 'value' => ' HTTP://127.0.0.1:8080/beacon '),
+            array('scope' => 'stores', 'scope_id' => '3', 'value' => 'http://duplicate.example.test'),
+            array('scope' => 'invalid', 'scope_id' => '4', 'value' => 'http://ignored.example.test'),
+            array('scope' => 'default', 'scope_id' => '9', 'value' => 'http://ignored.example.test'),
+        ),
+        array(
+            array('scope' => 'default', 'scope_id' => '0'),
+        )
+    );
+
+    basicrum_assert_same(
+        array(
+            array('scope' => 'websites', 'scope_id' => 2, 'value' => '0'),
+            array('scope' => 'stores', 'scope_id' => 3, 'value' => '1'),
+        ),
+        $policies,
+        'migration must preserve scoped HTTP and HTTPS behavior without overwriting explicit policy values'
+    );
+};
+
+$tests['setup installer persists versioned defaults through Magento APIs'] = function () use ($root) {
     $installerPath = $root
         . '/app/code/community/BasicRum/Analytics/sql/basicrum_analytics_setup/install-1.1.0.php';
     $consentPath = 'basicrum_analytics/privacy/opt_in_required';
+    $beaconPath = 'basicrum_analytics/general/beacon_endpoint';
+    $httpPolicyPath = 'basicrum_analytics/developer/development_mode';
 
     $cases = array(
         'new installation' => array(
             'queryResults' => array(false, false),
+            'fetchAllResults' => array(array(), array()),
             'expectedSaves' => array(array($consentPath, '1', 'default', 0)),
         ),
         'existing installation without an explicit decision' => array(
             'queryResults' => array(false, 'basicrum_analytics/general/enabled'),
+            'fetchAllResults' => array(array(), array()),
             'expectedSaves' => array(array($consentPath, '0', 'default', 0)),
         ),
         'installation with an explicit default-scope decision' => array(
@@ -483,13 +562,32 @@ $tests['privacy default installer persists the versioned decision through Magent
                 $consentPath,
                 'basicrum_analytics/general/enabled',
             ),
+            'fetchAllResults' => array(array(), array()),
             'expectedSaves' => array(),
+        ),
+        'existing scoped HTTP endpoints' => array(
+            'queryResults' => array(false, $beaconPath),
+            'fetchAllResults' => array(
+                array(
+                    array('scope' => 'default', 'scope_id' => '0', 'value' => 'http://collector.example.test'),
+                    array('scope' => 'websites', 'scope_id' => '2', 'value' => 'https://collector.example.test'),
+                    array('scope' => 'stores', 'scope_id' => '3', 'value' => 'http://127.0.0.1:8080/beacon'),
+                ),
+                array(
+                    array('scope' => 'stores', 'scope_id' => '3'),
+                ),
+            ),
+            'expectedSaves' => array(
+                array($consentPath, '0', 'default', 0),
+                array($httpPolicyPath, '1', 'default', 0),
+                array($httpPolicyPath, '0', 'websites', 2),
+            ),
         ),
     );
 
     foreach ($cases as $caseName => $case) {
         basicrum_test_reset();
-        $setup = new Basicrum_Test_Setup($case['queryResults']);
+        $setup = new Basicrum_Test_Setup($case['queryResults'], $case['fetchAllResults']);
         $setup->runInstaller($installerPath);
 
         basicrum_assert_same(1, $setup->started, $caseName . ': setup must start exactly once');
@@ -504,7 +602,7 @@ $tests['privacy default installer persists the versioned decision through Magent
             Mage::$configObject->saved,
             $caseName . ': installer persisted the wrong privacy default'
         );
-        basicrum_assert_same(2, count($setup->connection->selects), $caseName . ': expected two detection queries');
+        basicrum_assert_same(4, count($setup->connection->selects), $caseName . ': expected four detection queries');
         basicrum_assert_same('path', $setup->connection->selects[0]->columns, $caseName . ': query must avoid legacy expression classes');
         basicrum_assert_same(1, $setup->connection->selects[0]->limit, $caseName . ': explicit query must stop after one row');
         basicrum_assert_same(1, $setup->connection->selects[1]->limit, $caseName . ': footprint query must stop after one row');
@@ -521,6 +619,16 @@ $tests['privacy default installer persists the versioned decision through Magent
             array(array('path LIKE ?', 'basicrum_analytics/%')),
             $setup->connection->selects[1]->where,
             $caseName . ': upgrade detection must use the module configuration namespace'
+        );
+        basicrum_assert_same(
+            array(array('path = ?', $beaconPath)),
+            $setup->connection->selects[2]->where,
+            $caseName . ': HTTP preservation must inspect only Beacon URL rows'
+        );
+        basicrum_assert_same(
+            array(array('path = ?', $httpPolicyPath)),
+            $setup->connection->selects[3]->where,
+            $caseName . ': HTTP preservation must respect explicit policy rows'
         );
     }
 };

@@ -52,8 +52,9 @@ class BasicRum_Analytics_Helper_Data extends Mage_Core_Helper_Abstract
             return null;
         }
 
-        // Auto-upgrade HTTP to HTTPS when request is secure to prevent mixed content.
-        if (Mage::app()->getRequest()->isSecure()) {
+        // Enforce the production-safe policy even for values injected outside
+        // the admin backend model.
+        if (!$this->isDevelopmentMode()) {
             $url = preg_replace('/^http:\/\//i', 'https://', $url);
         }
 
@@ -128,6 +129,16 @@ class BasicRum_Analytics_Helper_Data extends Mage_Core_Helper_Abstract
     public function useUnminifiedLoaders(): bool
     {
         return Mage::getStoreConfigFlag('basicrum_analytics/developer/use_unminified_loaders');
+    }
+
+    /**
+     * Check whether HTTP Beacon URLs are explicitly allowed for local testing.
+     *
+     * @return bool
+     */
+    public function isDevelopmentMode(): bool
+    {
+        return Mage::getStoreConfigFlag('basicrum_analytics/developer/development_mode');
     }
 
     /**

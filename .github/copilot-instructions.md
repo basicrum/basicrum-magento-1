@@ -57,7 +57,7 @@ js/basicrum/
 | Class | Purpose |
 |-------|---------|
 | `BasicRum_Analytics_Block_Boomerang_Loader` | Generates the Boomerang JS inline script. Injected into the `before_body_end` reference. |
-| `BasicRum_Analytics_Helper_Data` | Retrieves admin config values: `isEnabled()`, `isOptInRequired()`, `getBeaconEndpoint()`, `useUnminifiedLoaders()`. |
+| `BasicRum_Analytics_Helper_Data` | Retrieves and normalizes scoped admin configuration, including privacy and HTTP policy. |
 | `BasicRum_Analytics_Helper_PageTypeDetector` | Detects page type from layout handles (home, product, category, etc.). |
 
 ### Configuration Paths
@@ -72,6 +72,7 @@ Access via `Mage::getStoreConfig()` or `Mage::getStoreConfigFlag()`:
 | `basicrum_analytics/general/brum_site_id` | string | Required Basicrum backend UUID v4 |
 | `basicrum_analytics/wait_after_onload/enabled` | bool | Enable delayed beacon sending |
 | `basicrum_analytics/wait_after_onload/wait_ms` | int | Milliseconds to wait before sending beacon |
+| `basicrum_analytics/developer/development_mode` | bool | Allow HTTP Beacon URLs only for local testing |
 | `basicrum_analytics/developer/use_unminified_loaders` | bool | Load non-minified JS for debugging |
 
 ### JavaScript Assets

@@ -22,8 +22,35 @@ class BasicRum_Analytics_Model_System_Config_Backend_BeaconEndpoint extends Mage
             );
         }
 
+        if (!$this->isHttpAllowed() && stripos($value, 'http://') === 0) {
+            $value = 'https://' . substr($value, 7);
+        }
+
         $this->setValue($value);
 
         return parent::_beforeSave();
+    }
+
+    /**
+     * Resolve the HTTP policy submitted on the same configuration form.
+     * Fall back to the current scoped value when the field was not posted.
+     *
+     * @return bool
+     */
+    private function isHttpAllowed(): bool
+    {
+        $groups = $this->getGroups();
+
+        if (is_array($groups)
+            && isset($groups['developer']['fields']['development_mode'])
+            && is_array($groups['developer']['fields']['development_mode'])
+        ) {
+            $field = $groups['developer']['fields']['development_mode'];
+            if (empty($field['inherit']) && array_key_exists('value', $field)) {
+                return (string) $field['value'] === '1';
+            }
+        }
+
+        return Mage::getStoreConfigFlag('basicrum_analytics/developer/development_mode');
     }
 }

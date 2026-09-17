@@ -10,7 +10,9 @@ app/code/community/BasicRum/Analytics/Block/Adminhtml/System/Config/Form/Field/R
 app/code/community/BasicRum/Analytics/Block/Boomerang/Loader.php               app/code/community/BasicRum/Analytics/Block/Boomerang/Loader.php
 app/code/community/BasicRum/Analytics/Helper/Data.php                          app/code/community/BasicRum/Analytics/Helper/Data.php
 app/code/community/BasicRum/Analytics/Helper/PageTypeDetector.php              app/code/community/BasicRum/Analytics/Helper/PageTypeDetector.php
+app/code/community/BasicRum/Analytics/Model/Setup/HttpPolicyDefault.php        app/code/community/BasicRum/Analytics/Model/Setup/HttpPolicyDefault.php
 app/code/community/BasicRum/Analytics/Model/Setup/PrivacyDefault.php           app/code/community/BasicRum/Analytics/Model/Setup/PrivacyDefault.php
+app/code/community/BasicRum/Analytics/Model/System/Config/Source/HttpPolicy.php app/code/community/BasicRum/Analytics/Model/System/Config/Source/HttpPolicy.php
 app/code/community/BasicRum/Analytics/Model/System/Config/Source/ConsentMode.php app/code/community/BasicRum/Analytics/Model/System/Config/Source/ConsentMode.php
 app/code/community/BasicRum/Analytics/Model/System/Config/Source/Version.php   app/code/community/BasicRum/Analytics/Model/System/Config/Source/Version.php
 app/code/community/BasicRum/Analytics/Model/System/Config/Backend/BeaconEndpoint.php app/code/community/BasicRum/Analytics/Model/System/Config/Backend/BeaconEndpoint.php

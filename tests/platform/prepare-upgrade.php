@@ -2,14 +2,14 @@
 declare(strict_types=1);
 
 if ($argc !== 4) {
-    fwrite(STDERR, "Usage: php prepare-upgrade.php <platform-root> <platform> <legacy|explicit>\n");
+    fwrite(STDERR, "Usage: php prepare-upgrade.php <platform-root> <platform> <legacy|explicit|http>\n");
     exit(2);
 }
 
 require __DIR__ . '/bootstrap.php';
 
 $scenario = $argv[3];
-if (!in_array($scenario, array('legacy', 'explicit'), true)) {
+if (!in_array($scenario, array('legacy', 'explicit', 'http'), true)) {
     fwrite(STDERR, "Unsupported upgrade scenario: {$scenario}\n");
     exit(2);
 }
@@ -31,17 +31,28 @@ $connection->delete(
     array('path LIKE ?' => 'basicrum_analytics/%')
 );
 
-if ($scenario === 'legacy') {
+if ($scenario === 'legacy' || $scenario === 'http') {
     Mage::getConfig()->saveConfig(
         'basicrum_analytics/general/enabled',
         '0',
         'default',
         0
     );
-} else {
+}
+
+if ($scenario === 'explicit') {
     Mage::getConfig()->saveConfig(
         'basicrum_analytics/privacy/opt_in_required',
         '1',
+        'default',
+        0
+    );
+}
+
+if ($scenario === 'http') {
+    Mage::getConfig()->saveConfig(
+        'basicrum_analytics/general/beacon_endpoint',
+        'http://127.0.0.1:8080/beacon',
         'default',
         0
     );

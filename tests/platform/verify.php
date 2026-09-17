@@ -28,6 +28,10 @@ basicrum_platform_assert_same(
     (string) $connection->fetchOne($select),
     'fresh installation did not persist the privacy-first default'
 );
+basicrum_platform_assert(
+    !Mage::getStoreConfigFlag('basicrum_analytics/developer/development_mode'),
+    'fresh installation did not start with HTTPS enforcement'
+);
 
 $helper = Mage::helper('basicrum_analytics');
 basicrum_platform_assert(
@@ -68,6 +72,12 @@ basicrum_platform_assert(
     'Magento did not resolve the Basicrum Beacon URL backend model'
 );
 
+$httpPolicy = Mage::getModel('basicrum_analytics/system_config_source_httpPolicy');
+basicrum_platform_assert(
+    $httpPolicy instanceof BasicRum_Analytics_Model_System_Config_Source_HttpPolicy,
+    'Magento did not resolve the Basicrum HTTP policy source model'
+);
+
 $layoutFile = Mage::getConfig()->getNode('frontend/layout/updates/basicrumanalytics/file');
 basicrum_platform_assert_same('basicrum_analytics.xml', (string) $layoutFile, 'frontend layout update is not registered');
 
@@ -79,6 +89,7 @@ basicrum_platform_save(array(
     'basicrum_analytics/privacy/opt_in_required' => '0',
     'basicrum_analytics/wait_after_onload/enabled' => '1',
     'basicrum_analytics/wait_after_onload/wait_ms' => '90000',
+    'basicrum_analytics/developer/development_mode' => '0',
     'basicrum_analytics/developer/use_unminified_loaders' => '0',
 ));
 basicrum_platform_reboot();
@@ -104,7 +115,33 @@ basicrum_platform_assert(
 );
 
 basicrum_platform_save(array(
+    'basicrum_analytics/general/beacon_endpoint' => 'http://collector.example.test/beacon?site=one',
+    'basicrum_analytics/developer/development_mode' => '0',
+));
+basicrum_platform_reboot();
+$strictHttp = Mage::app()->getLayout()
+    ->createBlock('basicrum_analytics/boomerang_loader')
+    ->getBoomerangSnippet();
+basicrum_platform_assert(
+    strpos($strictHttp, 'https:\/\/collector.example.test\/beacon?site=one') !== false,
+    'strict runtime policy did not upgrade an HTTP Beacon URL'
+);
+
+basicrum_platform_save(array(
+    'basicrum_analytics/developer/development_mode' => '1',
+));
+basicrum_platform_reboot();
+$developmentHttp = Mage::app()->getLayout()
+    ->createBlock('basicrum_analytics/boomerang_loader')
+    ->getBoomerangSnippet();
+basicrum_platform_assert(
+    strpos($developmentHttp, 'http:\/\/collector.example.test\/beacon?site=one') !== false,
+    'development HTTP policy did not preserve the configured Beacon URL'
+);
+
+basicrum_platform_save(array(
     'basicrum_analytics/general/beacon_endpoint' => 'javascript:alert(1)',
+    'basicrum_analytics/developer/development_mode' => '0',
 ));
 basicrum_platform_reboot();
 $invalid = Mage::app()->getLayout()
@@ -119,23 +156,45 @@ $websiteId = (int) $store->getWebsiteId();
 basicrum_platform_save(array(
     'basicrum_analytics/general/beacon_endpoint' => 'https://collector.example.test/beacon',
     'basicrum_analytics/privacy/opt_in_required' => '0',
+    'basicrum_analytics/privacy/strip_query_string' => '0',
+    'basicrum_analytics/developer/development_mode' => '0',
 ));
 basicrum_platform_save(array(
     'basicrum_analytics/privacy/opt_in_required' => '1',
+    'basicrum_analytics/privacy/strip_query_string' => '1',
+    'basicrum_analytics/developer/development_mode' => '1',
 ), 'websites', $websiteId);
 basicrum_platform_reboot();
 basicrum_platform_assert(
     Mage::getStoreConfigFlag('basicrum_analytics/privacy/opt_in_required', $storeId),
     'website-scope consent setting was not inherited by the store'
 );
+basicrum_platform_assert(
+    Mage::getStoreConfigFlag('basicrum_analytics/privacy/strip_query_string', $storeId),
+    'website-scope query-string setting was not inherited by the store'
+);
+basicrum_platform_assert(
+    Mage::getStoreConfigFlag('basicrum_analytics/developer/development_mode', $storeId),
+    'website-scope HTTP policy was not inherited by the store'
+);
 
 basicrum_platform_save(array(
     'basicrum_analytics/privacy/opt_in_required' => '0',
+    'basicrum_analytics/privacy/strip_query_string' => '0',
+    'basicrum_analytics/developer/development_mode' => '0',
 ), 'stores', $storeId);
 basicrum_platform_reboot();
 basicrum_platform_assert(
     !Mage::getStoreConfigFlag('basicrum_analytics/privacy/opt_in_required', $storeId),
     'store-scope consent setting did not override the website'
+);
+basicrum_platform_assert(
+    !Mage::getStoreConfigFlag('basicrum_analytics/privacy/strip_query_string', $storeId),
+    'store-scope query-string setting did not override the website'
+);
+basicrum_platform_assert(
+    !Mage::getStoreConfigFlag('basicrum_analytics/developer/development_mode', $storeId),
+    'store-scope HTTP policy did not override the website'
 );
 
 basicrum_platform_save(array(

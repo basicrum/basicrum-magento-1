@@ -87,8 +87,10 @@ Legend:
 
 - [ ] Decide whether Track Admin Users has a meaningful Magento 1 equivalent and
   implement it if applicable.
-- [ ] Add an explicit development-only HTTP policy or document why Magento's
-  current HTTP/HTTPS behavior is intentionally different.
+- [x] Add an explicit development-only HTTP policy.
+  - HTTPS is enforced by default. HTTP requires a scoped, clearly labeled local
+    testing option, and legacy HTTP/HTTPS endpoints retain their behavior through
+    a versioned scope-preserving upgrade policy.
 - [ ] Review Script Position as a behavioral requirement. Do not add a Header/Footer
   selector solely for visual parity: Magento's layout placement and runtime timing
   differ from WordPress.
@@ -127,7 +129,7 @@ Legend:
 
 - [x] Document manual consent integration as the supported Magento 1 strategy.
 - [x] Improve manual integration examples and copy actions.
-- [ ] Resolve Strip Query Strings and HTTP-policy parity.
+- [x] Resolve Strip Query Strings and HTTP-policy parity.
 
 ### Deferred — consent-provider adapters
 

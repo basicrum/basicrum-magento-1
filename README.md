@@ -42,6 +42,8 @@ Monitoring scripts are emitted only when all of these conditions are met:
 
 Both identity values are mandatory. Runtime validation is performed again when rendering, so missing, malformed, or programmatically injected values fail closed even if they bypass the admin backend models. Dynamic JavaScript values are JSON encoded with HTML-significant characters escaped.
 
+HTTPS Beacon URLs are enforced by default. The Developer setting **HTTP Strictness** can allow HTTP only for local testing; do not enable it on production stores. When strict mode is active, an HTTP URL saved through the admin is upgraded to HTTPS, and runtime rendering applies the same upgrade to values injected outside the admin path.
+
 ### Query-string privacy
 
 **Strip Query Strings** controls Boomerang's native URL redaction. It remains disabled by default to preserve the established Magento 1 behavior and match the WordPress default. When enabled, complete query strings in page, navigation, referrer, and resource URLs are replaced with `?qs-redacted` before beacons are sent; URL paths remain available for performance analysis.
@@ -86,9 +88,10 @@ Version 1.1.0 introduces a versioned Magento setup resource for the privacy defa
 - A genuinely new installation with no `basicrum_analytics/*` rows in `core_config_data` gets an explicit default-scope `opt_in_required=1`.
 - An upgraded store with an existing Basicrum configuration footprint and no explicit default-scope consent value gets `opt_in_required=0`, preserving the historical immediate-monitoring behavior.
 - An existing explicit default-scope consent value is never overwritten. Website and store overrides continue to inherit or override through normal Magento scope rules.
+- Existing HTTP Beacon URLs keep working after upgrade: for every explicit Beacon URL, the installer records a matching policy at the same scope (`HTTP` remains allowed and `HTTPS` remains strict) unless that scope already contains an explicit policy decision. Descendant scopes continue to inherit normally, and new installations remain HTTPS-strict.
 - A previously installed but never configured and disabled module is treated like a new installation; this cannot start monitoring because **Enable**, Beacon URL, and Site ID are still required.
 
-The migration policy lives in `BasicRum_Analytics_Model_Setup_PrivacyDefault` and is covered by the PHP test harness.
+The migration policies live in `BasicRum_Analytics_Model_Setup_PrivacyDefault` and `BasicRum_Analytics_Model_Setup_HttpPolicyDefault` and are covered by the PHP and native-platform test harnesses.
 
 Two 1.1.0 changes can intentionally stop monitoring until configuration or consent integration is corrected:
 
@@ -147,7 +150,7 @@ It also installs the extension into a real application and boots the storefront 
 | OpenMage 20.18.0 | PHP 8.3 | Native setup resource, configuration/rendering, scopes, and live storefront |
 | Maho 26.9.0 | PHP 8.3 | Native setup resource, admin rendering with global Varien aliases disabled, configuration/rendering, scopes, and live storefront |
 
-The real-install jobs exercise a fresh privacy-first installation, storefront-triggered upgrades from a simulated pre-1.1.0 database with and without an explicit consent decision, incomplete and unsafe configuration, immediate and consent-controlled rendering, the 30-second wait cap, default/website/store inheritance, frontend and admin block resolution, callback-compatible loader delivery, and disabled-mode suppression. Platform versions are deliberately pinned so upstream releases cannot silently change the test baseline; updates should be made explicitly after local validation.
+The real-install jobs exercise a fresh privacy-first installation, storefront-triggered upgrades from a simulated pre-1.1.0 database with and without explicit consent or legacy HTTP behavior, incomplete and unsafe configuration, HTTPS enforcement and development HTTP mode, immediate and consent-controlled rendering, query-string privacy, the 30-second wait cap, default/website/store inheritance, frontend and admin block resolution, callback-compatible loader delivery, and disabled-mode suppression. Platform versions are deliberately pinned so upstream releases cannot silently change the test baseline; updates should be made explicitly after local validation.
 
 For a local run, provide a disposable platform checkout and an empty MariaDB database, then run—for example—`bash tests/platform/run.sh openmage /path/to/openmage`. The default database is `basicrum` at `127.0.0.1` with username and password `basicrum`; override it with `BASICRUM_TEST_DB_HOST`, `BASICRUM_TEST_DB_NAME`, `BASICRUM_TEST_DB_USER`, and `BASICRUM_TEST_DB_PASSWORD`. The runner deploys the extension into the checkout and installs the application, so neither target should contain data that must be preserved.
 

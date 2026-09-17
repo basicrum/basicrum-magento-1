@@ -118,6 +118,7 @@ class Varien_Data_Form_Element_Abstract
 class Mage_Core_Model_Config_Data
 {
     private $value;
+    private $groups = array();
 
     public function setValue($value)
     {
@@ -128,6 +129,17 @@ class Mage_Core_Model_Config_Data
     public function getValue()
     {
         return $this->value;
+    }
+
+    public function setGroups(array $groups)
+    {
+        $this->groups = $groups;
+        return $this;
+    }
+
+    public function getGroups()
+    {
+        return $this->groups;
     }
 
     protected function _beforeSave()
@@ -166,11 +178,13 @@ class Basicrum_Test_Select
 class Basicrum_Test_Connection
 {
     public $fetchResults;
+    public $fetchAllResults;
     public $selects = array();
 
-    public function __construct(array $fetchResults)
+    public function __construct(array $fetchResults, array $fetchAllResults = array())
     {
         $this->fetchResults = $fetchResults;
+        $this->fetchAllResults = $fetchAllResults;
     }
 
     public function select()
@@ -192,6 +206,19 @@ class Basicrum_Test_Connection
 
         return array_shift($this->fetchResults);
     }
+
+    public function fetchAll($select)
+    {
+        if (!in_array($select, $this->selects, true)) {
+            throw new RuntimeException('Installer queried an unknown select object');
+        }
+
+        if (!$this->fetchAllResults) {
+            throw new RuntimeException('Installer made more fetchAll queries than expected');
+        }
+
+        return array_shift($this->fetchAllResults);
+    }
 }
 
 class Basicrum_Test_Config
@@ -212,9 +239,9 @@ class Basicrum_Test_Setup
     public $ended = 0;
     public $requestedTables = array();
 
-    public function __construct(array $fetchResults)
+    public function __construct(array $fetchResults, array $fetchAllResults = array())
     {
-        $this->connection = new Basicrum_Test_Connection($fetchResults);
+        $this->connection = new Basicrum_Test_Connection($fetchResults, $fetchAllResults);
     }
 
     public function startSetup()
@@ -344,6 +371,7 @@ function basicrum_test_reset(array $overrides = array())
         'basicrum_analytics/privacy/opt_in_required' => '0',
         'basicrum_analytics/wait_after_onload/enabled' => '0',
         'basicrum_analytics/wait_after_onload/wait_ms' => '0',
+        'basicrum_analytics/developer/development_mode' => '0',
         'basicrum_analytics/developer/use_unminified_loaders' => '0',
     ), $overrides);
     Mage::$app = new Basicrum_Test_App();
