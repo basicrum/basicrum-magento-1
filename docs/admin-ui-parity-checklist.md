@@ -55,7 +55,11 @@ Legend:
     phase. Any adapter must use documented current-page allow and withdrawal
     signals rather than inferring consent from the presence of a banner or an
     arbitrary cookie.
-- [ ] Improve manual integration usability with focused examples and copy actions.
+- [x] Improve manual integration usability with focused examples and copy actions.
+  - The allow and deny/expiry/withdrawal callbacks are presented separately so
+    administrators do not accidentally run both decisions as one sequence.
+  - Each read-only snippet has an accessible copy action with a select-and-copy
+    fallback when the Clipboard API is unavailable.
 - [x] Document the canonical WordPress-compatible opt-in and opt-out callback names.
 - [x] Document the legacy Magento callback aliases as compatibility APIs.
 - [x] Explain that Basicrum does not persist or infer consent.
@@ -121,7 +125,7 @@ Legend:
 ### P1 — integration parity
 
 - [x] Document manual consent integration as the supported Magento 1 strategy.
-- [ ] Improve manual integration examples and copy actions.
+- [x] Improve manual integration examples and copy actions.
 - [ ] Resolve Strip Query Strings and HTTP-policy parity.
 
 ### Deferred — consent-provider adapters

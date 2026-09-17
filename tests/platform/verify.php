@@ -150,5 +150,9 @@ basicrum_platform_assert(
     is_file($assetRoot . '/js/basicrum/loaders/consent-boomerang-loader-v1-15.min.js'),
     'consent loader is not deployed under the platform document root'
 );
+basicrum_platform_assert(
+    is_file($assetRoot . '/js/basicrum/admin/consent-info.js'),
+    'admin consent copy behavior is not deployed under the platform document root'
+);
 
 echo "Native {$platform} configuration and rendering checks passed.\n";

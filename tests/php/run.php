@@ -67,6 +67,62 @@ $tests['admin consent guidance is a full-width dependent row'] = function () use
         $html,
         'guidance must retain the legacy Magento callback alias'
     );
+    basicrum_assert_contains(
+        'Allow or grant callback',
+        $html,
+        'guidance must identify the allow integration point'
+    );
+    basicrum_assert_contains(
+        'Deny, expiry, or withdrawal callback',
+        $html,
+        'guidance must identify every opt-out integration point'
+    );
+    basicrum_assert_contains(
+        'Do not run the two snippets together',
+        $html,
+        'guidance must prevent the separated callbacks from being pasted as one sequence'
+    );
+    basicrum_assert_same(
+        2,
+        substr_count($html, 'class="scalable basicrum-copy-consent-snippet"'),
+        'each focused callback example must have a copy action'
+    );
+    basicrum_assert_same(
+        2,
+        substr_count($html, 'readonly="readonly"'),
+        'callback examples must be rendered in read-only fields'
+    );
+    basicrum_assert_contains(
+        'https://shop.example.test/js/basicrum/admin/consent-info.js',
+        $html,
+        'guidance must load the copy-action behavior from the Magento JS base URL'
+    );
+
+    $allowStart = strpos($html, '<textarea id="' . $elementId . '_allow_snippet"');
+    $denyStart = strpos($html, '<textarea id="' . $elementId . '_deny_snippet"');
+    basicrum_assert_true($allowStart !== false && $denyStart !== false, 'both callback snippets must render');
+    $allowSnippet = substr($html, $allowStart, strpos($html, '</textarea>', $allowStart) - $allowStart);
+    $denySnippet = substr($html, $denyStart, strpos($html, '</textarea>', $denyStart) - $denyStart);
+    basicrum_assert_contains(
+        'OPT_IN_BASICRUM_LOADER_WRAPPER',
+        $allowSnippet,
+        'allow example must contain only the opt-in integration'
+    );
+    basicrum_assert_not_contains(
+        'OPT_OUT_BASICRUM_LOADER_WRAPPER',
+        $allowSnippet,
+        'allow example must not immediately opt out'
+    );
+    basicrum_assert_contains(
+        'OPT_OUT_BASICRUM_LOADER_WRAPPER',
+        $denySnippet,
+        'deny example must contain the opt-out integration'
+    );
+    basicrum_assert_not_contains(
+        'OPT_IN_BASICRUM_LOADER_WRAPPER',
+        $denySnippet,
+        'deny example must not opt in'
+    );
 
     $xml = simplexml_load_file($root . '/app/code/community/BasicRum/Analytics/etc/system.xml');
     basicrum_assert_true($xml !== false, 'system configuration XML must parse');
