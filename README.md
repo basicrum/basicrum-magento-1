@@ -28,6 +28,7 @@ Copy these paths into the matching locations under the Magento root:
 - `js/basicrum`
 
 Clear Magento configuration and layout caches after installation or upgrade.
+On Maho, place `js/basicrum` under `public/js/basicrum` and run `composer dump-autoload` after deploying the PHP files so Maho rebuilds its module class map.
 
 ## Configuration
 
@@ -126,6 +127,18 @@ npm run build:consent-loader
 ```
 
 GitHub Actions runs PHP syntax/tests on PHP 7.4 and 8.3, the Playwright suite, XML validation, and packaging checks.
+
+It also installs the extension into a real application and boots the storefront for this pinned compatibility matrix:
+
+| Platform | Runtime | Coverage |
+|----------|---------|----------|
+| Magento CE 1.9.4.5 | PHP 7.4 | Native setup resource, configuration/rendering, scopes, and live storefront |
+| OpenMage 20.18.0 | PHP 8.3 | Native setup resource, configuration/rendering, scopes, and live storefront |
+| Maho 26.9.0 | PHP 8.3 | Native setup resource, configuration/rendering, scopes, and live storefront |
+
+The real-install jobs exercise a fresh privacy-first installation, incomplete and unsafe configuration, immediate and consent-controlled rendering, the 30-second wait cap, default/website/store inheritance, frontend layout injection, callback-compatible loader delivery, and disabled-mode suppression. Platform versions are deliberately pinned so upstream releases cannot silently change the test baseline; updates should be made explicitly after local validation.
+
+For a local run, provide a disposable platform checkout and an empty MariaDB database, then run—for example—`bash tests/platform/run.sh openmage /path/to/openmage`. The default database is `basicrum` at `127.0.0.1` with username and password `basicrum`; override it with `BASICRUM_TEST_DB_HOST`, `BASICRUM_TEST_DB_NAME`, `BASICRUM_TEST_DB_USER`, and `BASICRUM_TEST_DB_PASSWORD`. The runner deploys the extension into the checkout and installs the application, so neither target should contain data that must be preserved.
 
 ## Bundled Boomerang provenance
 
