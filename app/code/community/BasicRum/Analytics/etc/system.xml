@@ -47,11 +47,12 @@
                         <beacon_endpoint translate="label">
                             <label>Beacon Endpoint URL</label>
                             <frontend_type>text</frontend_type>
+                            <backend_model>basicrum_analytics/system_config_backend_beaconEndpoint</backend_model>
                             <sort_order>2</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
-                            <comment>Example: https://www.xxxxxx.com/beacon/catcher</comment>
+                            <comment>Required. HTTP or HTTPS URL supplied by Basicrum. Example: https://www.example.com/beacon/catcher</comment>
                         </beacon_endpoint>
                         <brum_site_id translate="label comment">
                             <label>BasicRUM Site ID</label>
@@ -61,7 +62,7 @@
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
-                            <comment><![CDATA[Unique identifier provided by BasicRUM. Helps to map beacons to your site. <br /> Example: <strong>xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx</strong>]]></comment>
+                            <comment><![CDATA[Required UUID v4 provided by Basicrum. Monitoring stays disabled until both this value and the Beacon Endpoint URL are valid. <br /> Example: <strong>e926c1a2-7e33-4f54-90d0-e6e31f3ad43d</strong>]]></comment>
                         </brum_site_id>
                     </fields>
                 </general>
@@ -74,7 +75,7 @@
                     <show_in_store>1</show_in_store>
                     <fields>
                         <opt_in_required translate="label">
-                            <label>Opt-In Required</label>
+                            <label>Require Consent Before Monitoring</label>
                             <frontend_type>select</frontend_type>
                             <frontend_model>basicrum_analytics/adminhtml_system_config_form_field_consentInfo</frontend_model>
                             <source_model>adminhtml/system_config_source_yesno</source_model>
@@ -82,6 +83,7 @@
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
+                            <comment>Recommended. Monitoring remains off until the external consent tool explicitly allows it on each page.</comment>
                         </opt_in_required>
                     </fields>
                 </privacy>
@@ -110,7 +112,7 @@
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
-                            <comment>Milliseconds to delay the beacon to capture additional metrics.</comment>
+                            <comment>Milliseconds to delay the beacon to capture additional metrics. Values are limited to 0–30000 milliseconds (30 seconds); larger values are capped at 30000.</comment>
                             <depends>
                                 <enabled>1</enabled>
                             </depends>

@@ -25,9 +25,11 @@ class BasicRum_Analytics_Block_Boomerang_Loader extends Mage_Core_Block_Abstract
             return '';
         }
 
-        // 1. Add anti-tampering technique.
-        $beaconEndpoint = Mage::helper('core')->escapeUrl($helper->getBeaconEndpoint());
-        if ($beaconEndpoint === null || trim($beaconEndpoint) === '') {
+        $beaconEndpoint = $helper->getBeaconEndpoint();
+        $siteId = $helper->getBrumSiteId();
+
+        // Monitoring is never emitted with an incomplete or invalid identity.
+        if ($beaconEndpoint === null || $siteId === null) {
             return '';
         }
 
@@ -47,16 +49,32 @@ class BasicRum_Analytics_Block_Boomerang_Loader extends Mage_Core_Block_Abstract
 
         $boomerangVars = [
             ["addVar", "p_type", $pageType],
-            ["addVar", "p_gen", "mage1"]
+            ["addVar", "p_gen", "mage1"],
+            ["addVar", "brum_site_id", $siteId]
         ];
-
-        $siteId = $helper->getBrumSiteId();
-        if ($siteId !== null) {
-            $boomerangVars[] = ["addVar", "brum_site_id", $siteId];
-        }
 
         $jsonFlags = JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT;
         $boomerangVarsJs = json_encode($boomerangVars, $jsonFlags);
+        $boomerangJsUrlJs = json_encode($boomerangJsUrl, $jsonFlags);
+        $loaderScriptUrlJs = json_encode($loaderScriptUrl, $jsonFlags);
+        $configJs = json_encode([
+            'beacon_url' => $beaconEndpoint,
+            'instrument_xhr' => false,
+            'Continuity' => [
+                'enabled' => true
+            ],
+            'ResourceTiming' => [
+                'enabled' => true,
+                'splitAtPath' => true
+            ],
+            'secure_cookie' => true,
+            'same_site_cookie' => 'Strict'
+        ], $jsonFlags);
+
+        if ($boomerangVarsJs === false || $boomerangJsUrlJs === false
+            || $loaderScriptUrlJs === false || $configJs === false) {
+            return '';
+        }
 
         $waitAfterOnloadScript = '';
         if ($waitAfterOnloadEnabled) {
@@ -91,37 +109,25 @@ SCRIPT;
         return;
     }
 
-    w.BOOMR_mq = window.BOOMR_mq || [];
+    w.BOOMR_mq = w.BOOMR_mq || [];
 
     w.BOOMR_mq.push.apply(w.BOOMR_mq, {$boomerangVarsJs});
 
-    w.BOOMR = (w.BOOMR !== undefined) ? w.BOOMR :  {};
+    w.BOOMR = w.BOOMR || {};
 
     var b = w.BOOMR;
-    
-    b.url = "{$boomerangJsUrl}";
+
+    b.url = {$boomerangJsUrlJs};
 
 {$waitAfterOnloadScript}
 
-    w.basicRumBoomerangConfig = {
-        beacon_url: "{$beaconEndpoint}",
-        instrument_xhr: false,
-        Continuity: {
-            enabled: true
-        },
-        ResourceTiming: {
-            "enabled": true,
-            "splitAtPath": true
-        },
-        secure_cookie: true,
-        same_site_cookie: "Strict"
-    }
+    w.basicRumBoomerangConfig = {$configJs};
 })(window);
 (function(d, s) {
   var js = d.createElement(s),
       sc = d.getElementsByTagName(s)[0];
 
-  js.src="{$loaderScriptUrl}";
+  js.src = {$loaderScriptUrlJs};
   js.async = true;
 
   sc.parentNode.insertBefore(js, sc);

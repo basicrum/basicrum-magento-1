@@ -2,7 +2,7 @@
 <config>
     <modules>
         <BasicRum_Analytics>
-            <version>1.0.1</version>
+            <version>1.1.0</version>
         </BasicRum_Analytics>
     </modules>
 
@@ -22,6 +22,16 @@
                 <class>BasicRum_Analytics_Block</class>
             </basicrum_analytics>
         </blocks>
+        <resources>
+            <basicrum_analytics_setup>
+                <setup>
+                    <module>BasicRum_Analytics</module>
+                </setup>
+                <connection>
+                    <use>core_setup</use>
+                </connection>
+            </basicrum_analytics_setup>
+        </resources>
     </global>
 
     <frontend>
@@ -53,11 +63,11 @@
                 <brum_site_id></brum_site_id>
             </general>
             <privacy>
-                <opt_in_required>0</opt_in_required>
+                <opt_in_required>1</opt_in_required>
             </privacy>
             <wait_after_onload>
                 <enabled>0</enabled>
-                <ms>0</ms>
+                <wait_ms>0</wait_ms>
             </wait_after_onload>
             <developer>
                 <use_unminified_loaders>0</use_unminified_loaders>

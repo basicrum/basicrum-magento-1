@@ -6,6 +6,11 @@ declare(strict_types=1);
  */
 class BasicRum_Analytics_Helper_Data extends Mage_Core_Helper_Abstract
 {
+    /**
+     * Basicrum backend identifiers are RFC 4122 UUID v4 values.
+     */
+    const BRUM_SITE_ID_PATTERN = '/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i';
+
 
     /**
      * Check if Basic RUM analytics is enabled
@@ -31,15 +36,18 @@ class BasicRum_Analytics_Helper_Data extends Mage_Core_Helper_Abstract
      */
     public function getBeaconEndpoint()
     {
-        $url = Mage::getStoreConfig('basicrum_analytics/general/beacon_endpoint');
-        if ($url && filter_var($url, FILTER_VALIDATE_URL)) {
-            // Auto-upgrade HTTP to HTTPS when request is secure to prevent mixed content
-            if (Mage::app()->getRequest()->isSecure()) {
-                $url = preg_replace('/^http:\/\//i', 'https://', $url);
-            }
-            return $url;
+        $url = trim((string) Mage::getStoreConfig('basicrum_analytics/general/beacon_endpoint'));
+
+        if (!self::isValidBeaconEndpoint($url)) {
+            return null;
         }
-        return null;
+
+        // Auto-upgrade HTTP to HTTPS when request is secure to prevent mixed content.
+        if (Mage::app()->getRequest()->isSecure()) {
+            $url = preg_replace('/^http:\/\//i', 'https://', $url);
+        }
+
+        return $url;
     }
 
     /**
@@ -48,8 +56,40 @@ class BasicRum_Analytics_Helper_Data extends Mage_Core_Helper_Abstract
      */
     public function getBrumSiteId()
     {
-        $value = Mage::getStoreConfig('basicrum_analytics/general/brum_site_id');
-        return $value ? trim($value) : null;
+        $value = trim((string) Mage::getStoreConfig('basicrum_analytics/general/brum_site_id'));
+
+        return self::isValidBrumSiteId($value) ? $value : null;
+    }
+
+    /**
+     * Validate a Beacon endpoint without accepting executable URL schemes.
+     *
+     * @param mixed $value
+     * @return bool
+     */
+    public static function isValidBeaconEndpoint($value): bool
+    {
+        if (!is_string($value) || $value === '' || filter_var($value, FILTER_VALIDATE_URL) === false) {
+            return false;
+        }
+
+        $parts = parse_url($value);
+        if (!is_array($parts) || empty($parts['scheme']) || empty($parts['host'])) {
+            return false;
+        }
+
+        return in_array(strtolower($parts['scheme']), ['http', 'https'], true);
+    }
+
+    /**
+     * Validate the Basicrum backend identifier contract (UUID v4).
+     *
+     * @param mixed $value
+     * @return bool
+     */
+    public static function isValidBrumSiteId($value): bool
+    {
+        return is_string($value) && preg_match(self::BRUM_SITE_ID_PATTERN, $value) === 1;
     }
 
     /**
@@ -68,7 +108,7 @@ class BasicRum_Analytics_Helper_Data extends Mage_Core_Helper_Abstract
     public function getWaitAfterOnloadMilliseconds(): int
     {
         $value = (int) Mage::getStoreConfig('basicrum_analytics/wait_after_onload/wait_ms');
-        return max(0, $value);
+        return min(30000, max(0, $value));
     }
 
     /**
