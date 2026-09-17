@@ -19,9 +19,10 @@ class BasicRum_Analytics_Block_Adminhtml_System_Config_Form_Field_RequiredSettin
     private const ENABLED_FIELD_ID = 'basicrum_analytics_general_enabled';
     private const BEACON_FIELD_ID = 'basicrum_analytics_general_beacon_endpoint';
     private const SITE_ID_FIELD_ID = 'basicrum_analytics_general_brum_site_id';
+    private const CONSENT_FIELD_ID = 'basicrum_analytics_privacy_opt_in_required';
 
     /**
-     * Render the native field row and a page-level warning after the Site ID.
+     * Render the native field row and monitoring status after the Site ID.
      *
      * @param Varien_Data_Form_Element_Abstract $element
      * @return string
@@ -30,14 +31,11 @@ class BasicRum_Analytics_Block_Adminhtml_System_Config_Form_Field_RequiredSettin
     {
         $html = parent::render($element);
 
-        if (!$this->isSiteIdElement($element)
-            || !$this->isMonitoringEnabled($element)
-            || $this->hasValidRequiredSettings($element)
-        ) {
+        if (!$this->isSiteIdElement($element)) {
             return $html;
         }
 
-        return $html . $this->getConfigurationWarningHtml();
+        return $html . $this->getMonitoringStatusHtml($element);
     }
 
     /**
@@ -93,13 +91,13 @@ class BasicRum_Analytics_Block_Adminhtml_System_Config_Form_Field_RequiredSettin
         if ($this->isBeaconElement($element)) {
             if ($value === '') {
                 return Mage::helper('basicrum_analytics')->__(
-                    'Beacon Endpoint URL is required while monitoring is enabled. Monitoring remains inactive.'
+                    'Beacon URL is required while monitoring is enabled. Monitoring remains inactive.'
                 );
             }
 
             if (!BasicRum_Analytics_Helper_Data::isValidBeaconEndpoint($value)) {
                 return Mage::helper('basicrum_analytics')->__(
-                    'Enter a valid HTTP or HTTPS Beacon Endpoint URL. Monitoring remains inactive.'
+                    'Enter a valid HTTP or HTTPS Beacon URL. Monitoring remains inactive.'
                 );
             }
         }
@@ -107,13 +105,13 @@ class BasicRum_Analytics_Block_Adminhtml_System_Config_Form_Field_RequiredSettin
         if ($this->isSiteIdElement($element)) {
             if ($value === '') {
                 return Mage::helper('basicrum_analytics')->__(
-                    'BasicRUM Site ID is required while monitoring is enabled. Monitoring remains inactive.'
+                    'Brum Site ID is required while monitoring is enabled. Monitoring remains inactive.'
                 );
             }
 
             if (!BasicRum_Analytics_Helper_Data::isValidBrumSiteId($value)) {
                 return Mage::helper('basicrum_analytics')->__(
-                    'Enter a valid UUID v4 BasicRUM Site ID. Monitoring remains inactive.'
+                    'Enter a valid UUID v4 Brum Site ID. Monitoring remains inactive.'
                 );
             }
         }
@@ -153,6 +151,19 @@ class BasicRum_Analytics_Block_Adminhtml_System_Config_Form_Field_RequiredSettin
 
         return BasicRum_Analytics_Helper_Data::isValidBeaconEndpoint($beacon)
             && BasicRum_Analytics_Helper_Data::isValidBrumSiteId($siteId);
+    }
+
+    /**
+     * @param Varien_Data_Form_Element_Abstract $element
+     * @return bool
+     */
+    private function isConsentRequired(Varien_Data_Form_Element_Abstract $element): bool
+    {
+        return (string) $this->getFormValue(
+            $element,
+            self::CONSENT_FIELD_ID,
+            'basicrum_analytics/privacy/opt_in_required'
+        ) === '1';
     }
 
     /**
@@ -205,19 +216,47 @@ class BasicRum_Analytics_Block_Adminhtml_System_Config_Form_Field_RequiredSettin
     }
 
     /**
+     * @param Varien_Data_Form_Element_Abstract $element
      * @return string
      */
-    private function getConfigurationWarningHtml(): string
+    private function getMonitoringStatusHtml(Varien_Data_Form_Element_Abstract $element): string
     {
-        $message = Mage::helper('basicrum_analytics')->__(
-            'Basicrum monitoring is enabled but inactive. Monitoring scripts are not emitted until both required fields contain valid values.'
-        );
+        $helper = Mage::helper('basicrum_analytics');
+
+        if (!$this->isMonitoringEnabled($element)) {
+            $heading = $helper->__('Monitoring status: Disabled');
+            $message = $helper->__('Basicrum is disabled. No monitoring scripts are emitted.');
+            $background = '#f5f5f5';
+            $border = '#777777';
+        } elseif (!$this->hasValidRequiredSettings($element)) {
+            $heading = $helper->__('Monitoring status: Blocked');
+            $message = $helper->__(
+                'Basicrum monitoring is enabled but inactive. Monitoring scripts are not emitted until both required fields contain valid values.'
+            );
+            $background = '#fff9e6';
+            $border = '#eb5202';
+        } elseif ($this->isConsentRequired($element)) {
+            $heading = $helper->__('Monitoring status: Waiting for consent');
+            $message = $helper->__(
+                'Basicrum is configured. Boomerang loads only after the external consent tool explicitly allows monitoring on the current page.'
+            );
+            $background = '#eef5ff';
+            $border = '#1976d2';
+        } else {
+            $heading = $helper->__('Monitoring status: Active');
+            $message = $helper->__(
+                'Basicrum monitoring starts immediately on storefront pages without waiting for consent.'
+            );
+            $background = '#edf7ed';
+            $border = '#2e7d32';
+        }
 
         return '<tr id="row_basicrum_analytics_general_configuration_status">'
             . '<td colspan="4" style="padding: 0 15px 10px;">'
             . '<div role="status" style="box-sizing: border-box; width: 100%; padding: 12px 15px; '
-            . 'background: #fff9e6; border-left: 4px solid #eb5202;">'
-            . '<strong>' . htmlspecialchars($message, ENT_QUOTES, 'UTF-8') . '</strong>'
+            . 'background: ' . $background . '; border-left: 4px solid ' . $border . ';">'
+            . '<strong>' . htmlspecialchars($heading, ENT_QUOTES, 'UTF-8') . '</strong>'
+            . '<div style="margin-top: 4px;">' . htmlspecialchars($message, ENT_QUOTES, 'UTF-8') . '</div>'
             . '</div></td></tr>';
     }
 }

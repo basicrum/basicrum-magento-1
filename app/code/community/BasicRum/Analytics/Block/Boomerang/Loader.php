@@ -2,7 +2,7 @@
 declare(strict_types=1);
 
 /**
- * BasicRUM Analytics Boomerang Loader Block
+ * Basicrum Analytics Boomerang Loader Block
  */
 class BasicRum_Analytics_Block_Boomerang_Loader extends Mage_Core_Block_Abstract
 {

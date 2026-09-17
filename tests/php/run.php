@@ -127,6 +127,21 @@ $tests['admin consent guidance is a full-width dependent row'] = function () use
         $html,
         'guidance must load the copy-action behavior from the Magento JS base URL'
     );
+    basicrum_assert_contains(
+        'overflow-wrap: anywhere',
+        $html,
+        'long callback names must wrap on narrow admin viewports'
+    );
+    basicrum_assert_contains(
+        'max-width: 100%',
+        $html,
+        'callback snippets must stay within the available width'
+    );
+    basicrum_assert_not_contains(
+        'white-space: nowrap',
+        $html,
+        'consent guidance must not force callback names beyond narrow viewports'
+    );
 
     $allowStart = strpos($html, '<textarea id="' . $elementId . '_allow_snippet"');
     $denyStart = strpos($html, '<textarea id="' . $elementId . '_deny_snippet"');
@@ -193,6 +208,37 @@ $tests['admin hides runtime controls while monitoring is disabled'] = function (
     $privacyFields = $groups->privacy->fields;
     $waitFields = $groups->wait_after_onload->fields;
     $developerFields = $groups->developer->fields;
+
+    basicrum_assert_same(
+        'Basicrum',
+        (string) $xml->tabs->basicrum_analytics->label,
+        'admin tab must use canonical product casing'
+    );
+    basicrum_assert_same(
+        'Basicrum Settings',
+        (string) $xml->sections->basicrum_analytics->label,
+        'configuration page must clearly identify Basicrum'
+    );
+    basicrum_assert_contains(
+        'Basicrum — Real User Monitoring',
+        (string) $groups->general->comment,
+        'General Settings introduction must identify the product'
+    );
+    basicrum_assert_same('Enable Basicrum', (string) $generalFields->enabled->label, 'enable label must name Basicrum');
+    basicrum_assert_same('Beacon URL', (string) $generalFields->beacon_endpoint->label, 'Beacon label must match WordPress');
+    basicrum_assert_same('Brum Site ID', (string) $generalFields->brum_site_id->label, 'Site ID label must match WordPress');
+    basicrum_assert_same(
+        'Boomerang Version',
+        (string) $generalFields->boomerang_version->label,
+        'Boomerang label must match WordPress'
+    );
+    $adminAcl = simplexml_load_file($root . '/app/code/community/BasicRum/Analytics/etc/adminhtml.xml');
+    basicrum_assert_same(
+        'Basicrum Settings',
+        (string) $adminAcl->acl->resources->admin->children->system->children->config
+            ->children->basicrum_analytics->title,
+        'ACL title must use the visible settings-page name'
+    );
 
     basicrum_assert_same(
         array(),
@@ -278,15 +324,20 @@ $tests['enabled incomplete configuration is visibly inactive'] = function () use
     basicrum_assert_contains('aria-invalid="true"', $beaconHtml, 'missing Beacon URL must be invalid');
     basicrum_assert_contains('validation-failed', $beaconHtml, 'missing Beacon URL must be highlighted');
     basicrum_assert_contains(
-        'Beacon Endpoint URL is required while monitoring is enabled',
+        'Beacon URL is required while monitoring is enabled',
         $beaconHtml,
         'missing Beacon URL must have field-level guidance'
     );
     basicrum_assert_contains('aria-invalid="true"', $siteIdHtml, 'missing Site ID must be invalid');
     basicrum_assert_contains(
-        'BasicRUM Site ID is required while monitoring is enabled',
+        'Brum Site ID is required while monitoring is enabled',
         $siteIdHtml,
         'missing Site ID must have field-level guidance'
+    );
+    basicrum_assert_contains(
+        'Monitoring status: Blocked',
+        $siteIdHtml,
+        'incomplete enabled configuration must identify its blocked state'
     );
     basicrum_assert_contains(
         'Basicrum monitoring is enabled but inactive',
@@ -333,7 +384,11 @@ $tests['admin required-setting feedback respects validity enabled state and reso
     );
     $validForm->addElement('basicrum_analytics_general_enabled', $validEnabled)
         ->addElement('basicrum_analytics_general_beacon_endpoint', $validBeacon)
-        ->addElement('basicrum_analytics_general_brum_site_id', $validSiteId);
+        ->addElement('basicrum_analytics_general_brum_site_id', $validSiteId)
+        ->addElement(
+            'basicrum_analytics_privacy_opt_in_required',
+            new Varien_Data_Form_Element_Abstract('basicrum_analytics_privacy_opt_in_required', '0')
+        );
 
     $validHtml = $renderer->render($validBeacon) . $renderer->render($validSiteId);
     basicrum_assert_contains('aria-invalid="false"', $validHtml, 'valid required fields must not be invalid');
@@ -342,6 +397,11 @@ $tests['admin required-setting feedback respects validity enabled state and reso
         'Basicrum monitoring is enabled but inactive',
         $validHtml,
         'resolved valid scope values must suppress the inactive warning'
+    );
+    basicrum_assert_contains(
+        'Monitoring status: Active',
+        $validHtml,
+        'valid immediate configuration must display active status'
     );
 
     $disabledForm = new Basicrum_Test_Form();
@@ -361,6 +421,36 @@ $tests['admin required-setting feedback respects validity enabled state and reso
         $disabledHtml,
         'disabled monitoring must not display an inactive warning'
     );
+    basicrum_assert_contains(
+        'Monitoring status: Disabled',
+        $disabledHtml,
+        'disabled configuration must display disabled status'
+    );
+
+    $consentForm = new Basicrum_Test_Form();
+    $consentEnabled = new Varien_Data_Form_Element_Abstract('basicrum_analytics_general_enabled', '1');
+    $consentBeacon = new Varien_Data_Form_Element_Abstract(
+        'basicrum_analytics_general_beacon_endpoint',
+        'https://collector.example.test/beacon'
+    );
+    $consentSiteId = new Varien_Data_Form_Element_Abstract(
+        'basicrum_analytics_general_brum_site_id',
+        '550e8400-e29b-41d4-a716-446655440000'
+    );
+    $consentRequired = new Varien_Data_Form_Element_Abstract(
+        'basicrum_analytics_privacy_opt_in_required',
+        '1'
+    );
+    $consentForm->addElement('basicrum_analytics_general_enabled', $consentEnabled)
+        ->addElement('basicrum_analytics_general_beacon_endpoint', $consentBeacon)
+        ->addElement('basicrum_analytics_general_brum_site_id', $consentSiteId)
+        ->addElement('basicrum_analytics_privacy_opt_in_required', $consentRequired);
+    $consentHtml = $renderer->render($consentSiteId);
+    basicrum_assert_contains(
+        'Monitoring status: Waiting for consent',
+        $consentHtml,
+        'valid consent-controlled configuration must display waiting status'
+    );
 
     $invalidForm = new Basicrum_Test_Form();
     $invalidEnabled = new Varien_Data_Form_Element_Abstract('basicrum_analytics_general_enabled', '1');
@@ -375,14 +465,19 @@ $tests['admin required-setting feedback respects validity enabled state and reso
 
     $invalidHtml = $renderer->render($invalidBeacon) . $renderer->render($invalidSiteId);
     basicrum_assert_contains(
-        'Enter a valid HTTP or HTTPS Beacon Endpoint URL',
+        'Enter a valid HTTP or HTTPS Beacon URL',
         $invalidHtml,
         'invalid Beacon URL must have field-level guidance'
     );
     basicrum_assert_contains(
-        'Enter a valid UUID v4 BasicRUM Site ID',
+        'Enter a valid UUID v4 Brum Site ID',
         $invalidHtml,
         'invalid Site ID must have field-level guidance'
+    );
+    basicrum_assert_contains(
+        'Monitoring status: Blocked',
+        $invalidHtml,
+        'invalid enabled configuration must display blocked status'
     );
 };
 

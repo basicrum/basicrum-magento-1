@@ -2,7 +2,7 @@
 declare(strict_types=1);
 
 /**
- * BasicRum Analytics Helper
+ * Basicrum Analytics Helper
  */
 class BasicRum_Analytics_Helper_Data extends Mage_Core_Helper_Abstract
 {
@@ -62,7 +62,7 @@ class BasicRum_Analytics_Helper_Data extends Mage_Core_Helper_Abstract
     }
 
     /**
-     * Get the BasicRUM Site ID
+     * Get the Brum Site ID
      * @return string|null
      */
     public function getBrumSiteId()

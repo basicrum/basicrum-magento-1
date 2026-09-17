@@ -9,7 +9,7 @@
                             <config>
                                 <children>
                                     <basicrum_analytics>
-                                        <title>BasicRum Analytics</title>
+                                        <title>Basicrum Settings</title>
                                     </basicrum_analytics>
                                 </children>
                             </config>

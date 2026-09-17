@@ -81,7 +81,7 @@ Legend:
 - [x] Disable or hide irrelevant dependent controls when the module is disabled.
   - Magento's native field dependencies hide and disable privacy, wait, and
     developer runtime controls. Stored scoped values remain intact.
-  - Boomerang version, Beacon Endpoint URL, and BasicRUM Site ID stay visible so
+  - Boomerang version, Beacon URL, and Brum Site ID stay visible so
     administrators can inspect or prepare identity configuration before enabling.
 - [x] Reveal Wait After Onload milliseconds only when Wait After Onload is enabled.
 - [x] Hide consent-specific controls when the module itself is disabled.
@@ -90,25 +90,38 @@ Legend:
 
 ## Remaining WordPress controls
 
-- [ ] Decide whether Track Admin Users has a meaningful Magento 1 equivalent and
-  implement it if applicable.
+- [x] Resolve Track Admin Users as an intentional platform difference.
+  - WordPress can identify a logged-in frontend user with the `manage_options`
+    capability. Magento authenticates backend users in the separate `adminhtml`
+    application and does not expose a reliable admin identity on storefront
+    requests. Basicrum never runs on admin pages, and initializing the admin
+    session in the frontend solely for tracking exclusion would add coupling and
+    session risk. No misleading Magento setting is added; collector-side staff
+    exclusion or a future explicit frontend signal remains available for stores
+    that require it.
 - [x] Add an explicit development-only HTTP policy.
   - HTTPS is enforced by default. HTTP requires a scoped, clearly labeled local
     testing option, and legacy HTTP/HTTPS endpoints retain their behavior through
     a versioned scope-preserving upgrade policy.
-- [ ] Review Script Position as a behavioral requirement. Do not add a Header/Footer
-  selector solely for visual parity: Magento's layout placement and runtime timing
-  differ from WordPress.
+- [x] Keep Script Position fixed at Magento's native `before_body_end` reference.
+  - This matches WordPress's safe default footer behavior without pretending that
+    Magento themes provide a portable `wp_head` equivalent. Moving consent mode
+    earlier would also change callback-registration timing, so no selector is
+    added without a separate behavioral requirement.
 
 ## Presentation and discoverability
 
-- [ ] Align product casing and field terminology across implementations:
-  - `Basicrum` versus `BasicRUM`
-  - `Beacon URL` versus `Beacon Endpoint URL`
-  - `Brum Site ID` versus `BasicRUM Site ID`
-- [ ] Give the Magento configuration page a clearer Basicrum identity while
+- [x] Align product casing and field terminology with WordPress.
+  - User-facing Magento copy now consistently uses `Basicrum`, `Beacon URL`, and
+    `Brum Site ID`; internal `BasicRum_Analytics` class and module identifiers are
+    retained for backward compatibility.
+- [x] Give the Magento configuration page a clearer Basicrum identity while
   retaining native Magento administration patterns.
-- [ ] Improve complex help content for narrower admin viewports.
+  - The native tab and page are labeled Basicrum and Basicrum Settings, and the
+    General Settings introduction identifies the product and configuration scope.
+- [x] Improve complex help content for narrower admin viewports.
+  - Long callback names wrap, code fields remain within the available width, and
+    copy controls wrap without changing Magento's native configuration layout.
 - [ ] Replace `docs/media/admin-area.png` after the admin UI work is complete; the
   checked-in screenshot no longer represents the current settings UI.
 
@@ -145,19 +158,19 @@ Legend:
 
 ### P2 — refinement
 
-- [ ] Resolve Track Admin Users applicability.
-- [ ] Align terminology and branding.
-- [ ] Review narrow-viewport presentation.
+- [x] Resolve Track Admin Users applicability.
+- [x] Align terminology and branding.
+- [x] Review narrow-viewport presentation.
 - [ ] Update the admin screenshot after the UI stabilizes.
 
 ## Completion criteria
 
-- [ ] A new administrator can tell whether monitoring is active, inactive, or
-  blocked by incomplete configuration without reading source code.
+- [x] A new administrator can tell whether monitoring is active, disabled, waiting
+  for consent, or blocked by incomplete configuration without reading source code.
 - [x] Consent-controlled mode clearly explains what the external consent tool must
   do and shows only relevant instructions.
 - [x] Immediate mode does not display consent-integration instructions.
 - [x] Required configuration errors are visible at the affected fields.
 - [x] Magento configuration scopes continue to work at all supported levels.
-- [ ] Platform-specific differences are documented and intentional.
+- [x] Platform-specific differences are documented and intentional.
 - [ ] Updated screenshots match the shipped admin UI.

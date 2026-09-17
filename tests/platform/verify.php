@@ -87,6 +87,11 @@ $waitFields = $adminGroups->wait_after_onload->fields;
 $developerFields = $adminGroups->developer->fields;
 $generalEnabledOnly = array('general/enabled' => '1');
 
+basicrum_platform_assert_same('Basicrum Settings', (string) $adminSection->label, 'admin page label is stale');
+basicrum_platform_assert_same('Enable Basicrum', (string) $generalFields->enabled->label, 'enable label is stale');
+basicrum_platform_assert_same('Beacon URL', (string) $generalFields->beacon_endpoint->label, 'Beacon label is stale');
+basicrum_platform_assert_same('Brum Site ID', (string) $generalFields->brum_site_id->label, 'Site ID label is stale');
+
 basicrum_platform_assert_same(
     array(),
     basicrum_platform_dependency_map($generalFields->beacon_endpoint, 'general'),

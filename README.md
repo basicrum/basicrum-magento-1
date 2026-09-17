@@ -32,17 +32,19 @@ On Maho, place `js/basicrum` under `public/js/basicrum` and run `composer dump-a
 
 ## Configuration
 
-Go to **System > Configuration > BasicRUM Analytics**. Configuration remains available at Magento's default, website, and store scopes.
+Go to **System > Configuration > Basicrum > Basicrum Settings**. Configuration remains available at Magento's default, website, and store scopes.
 
 Monitoring scripts are emitted only when all of these conditions are met:
 
-- **Enable** is set to Yes.
-- **Beacon Endpoint URL** is a valid HTTP or HTTPS URL.
-- **BasicRUM Site ID** is a valid RFC 4122 UUID v4.
+- **Enable Basicrum** is set to Yes.
+- **Beacon URL** is a valid HTTP or HTTPS URL.
+- **Brum Site ID** is a valid RFC 4122 UUID v4.
 
 Both identity values are mandatory. Runtime validation is performed again when rendering, so missing, malformed, or programmatically injected values fail closed even if they bypass the admin backend models. Dynamic JavaScript values are JSON encoded with HTML-significant characters escaped.
 
-When **Enable** is set to No, Magento keeps the bundled Boomerang version, Beacon Endpoint URL, and BasicRUM Site ID visible so an administrator can prepare or inspect the identity configuration before enabling monitoring. Privacy, wait, and developer runtime controls are hidden and disabled through Magento's native field dependencies. Their stored default, website, and store-view values are retained and reappear when monitoring is enabled; normal scope inheritance and **Use Default/Use Website** behavior are unchanged.
+The status panel reports whether monitoring is Disabled, Blocked by invalid or incomplete identity configuration, Waiting for consent, or Active in immediate mode.
+
+When **Enable Basicrum** is set to No, Magento keeps the bundled Boomerang version, Beacon URL, and Brum Site ID visible so an administrator can prepare or inspect the identity configuration before enabling monitoring. Privacy, wait, and developer runtime controls are hidden and disabled through Magento's native field dependencies. Their stored default, website, and store-view values are retained and reappear when monitoring is enabled; normal scope inheritance and **Use Default/Use Website** behavior are unchanged.
 
 HTTPS Beacon URLs are enforced by default. The Developer setting **HTTP Strictness** can allow HTTP only for local testing; do not enable it on production stores. When strict mode is active, an HTTP URL saved through the admin is upgraded to HTTPS, and runtime rendering applies the same upgrade to values injected outside the admin path.
 
@@ -50,7 +52,7 @@ HTTPS Beacon URLs are enforced by default. The Developer setting **HTTP Strictne
 
 **Strip Query Strings** controls Boomerang's native URL redaction. It remains disabled by default to preserve the established Magento 1 behavior and match the WordPress default. When enabled, complete query strings in page, navigation, referrer, and resource URLs are replaced with `?qs-redacted` before beacons are sent; URL paths remain available for performance analysis.
 
-This setting does not modify query parameters in the configured Beacon Endpoint URL. Those parameters are part of the collector destination and continue to be safely serialized unchanged.
+This setting does not modify query parameters in the configured Beacon URL. Those parameters are part of the collector destination and continue to be safely serialized unchanged.
 
 ### Consent-controlled loading
 
@@ -109,6 +111,12 @@ basicrum_analytics/wait_after_onload/wait_ms
 ```
 
 Values are clamped to 0–30000 milliseconds. The older mismatched `ms` default key is no longer used.
+
+### Magento-specific administrator and script behavior
+
+WordPress can exclude logged-in users with the `manage_options` capability because its administrators and storefront visitors share the same user system. Magento admin users authenticate in the separate `adminhtml` application and do not have a reliable frontend identity. Basicrum is not emitted on Magento admin pages, and a backend user visiting the storefront is indistinguishable from any other storefront visitor without initializing an admin session in the frontend. For that reason Magento 1 does not expose a misleading **Track Admin Users** setting. Stores that need staff-traffic exclusion should use collector-side rules or a separately designed frontend signal.
+
+Magento inserts the configuration and async loader in the native `before_body_end` layout reference. This is the documented, fixed equivalent of WordPress's default footer placement. A Header/Footer selector is intentionally not provided: moving the consent loader to the header would alter registration timing and could start immediate-mode downloads earlier, while Magento themes do not provide a single portable header insertion point equivalent to WordPress's `wp_head`.
 
 ## Page type compatibility
 
