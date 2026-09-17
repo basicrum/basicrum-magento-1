@@ -47,10 +47,14 @@ Legend:
   disabled.
   - Implemented with Magento's native field dependency mechanism, including
     inherited Website and Store View configuration.
-- [ ] Add an explicit Automatic/Manual consent integration choice, or document an
-  intentional decision that Magento remains manual-only.
-- [ ] If automatic integration is added, show the active provider, detected
-  providers, diagnostics, and a next action comparable to WordPress.
+- [x] Keep manual callbacks as the intentional Magento 1 consent integration.
+  - Magento 1/OpenMage does not provide a standardized consent-provider API
+    comparable to WordPress. Native Cookie Restriction Mode is a basic persisted
+    allow signal, while third-party consent tools expose provider-specific APIs.
+  - Automatic native or third-party provider adapters are deferred to a future
+    phase. Any adapter must use documented current-page allow and withdrawal
+    signals rather than inferring consent from the presence of a banner or an
+    arbitrary cookie.
 - [ ] Improve manual integration usability with focused examples and copy actions.
 - [x] Document the canonical WordPress-compatible opt-in and opt-out callback names.
 - [x] Document the legacy Magento callback aliases as compatibility APIs.
@@ -116,10 +120,16 @@ Legend:
 
 ### P1 — integration parity
 
-- [ ] Decide and implement the Magento automatic-consent integration strategy.
-- [ ] Add integration status and diagnostics if automatic integration is supported.
+- [x] Document manual consent integration as the supported Magento 1 strategy.
 - [ ] Improve manual integration examples and copy actions.
 - [ ] Resolve Strip Query Strings and HTTP-policy parity.
+
+### Deferred — consent-provider adapters
+
+- [ ] Investigate optional adapters for Magento Cookie Restriction Mode and named
+  third-party consent tools when they expose reliable allow and withdrawal APIs.
+- [ ] If adapters are added, provide explicit selection, active-provider status,
+  diagnostics, and a clear next action instead of heuristic auto-detection.
 
 ### P2 — refinement
 
