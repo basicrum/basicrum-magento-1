@@ -2,13 +2,13 @@
 <config>
     <tabs>
         <basicrum_analytics translate="label">
-            <label>BasicRUM Analytics</label>
+            <label>Basicrum</label>
             <sort_order>9999</sort_order>
         </basicrum_analytics>
     </tabs>
     <sections>
         <basicrum_analytics translate="label">
-            <label>Configuration</label>
+            <label>Basicrum Settings</label>
             <tab>basicrum_analytics</tab>
             <frontend_type>text</frontend_type>
             <sort_order>100</sort_order>
@@ -23,10 +23,10 @@
                     <show_in_default>1</show_in_default>
                     <show_in_website>1</show_in_website>
                     <show_in_store>1</show_in_store>
-                    <comment><![CDATA[<strong style="color: #eb5202;">BasicRUM</strong> - Open Source Real User Monitoring system - <a href="https://www.basicrum.com/" target="_blank">https://www.basicrum.com/</a>]]></comment>
+                    <comment><![CDATA[<strong style="color: #eb5202;">Basicrum — Real User Monitoring</strong><br />Configure the collector identity and monitoring state for this scope. <a href="https://www.basicrum.com/" target="_blank" rel="noopener">Visit basicrum.com</a>]]></comment>
                     <fields>
                         <enabled translate="label">
-                            <label>Enable</label>
+                            <label>Enable Basicrum</label>
                             <frontend_type>select</frontend_type>
                             <source_model>adminhtml/system_config_source_yesno</source_model>
                             <sort_order>0</sort_order>
@@ -35,7 +35,7 @@
                             <show_in_store>1</show_in_store>
                         </enabled>
                         <boomerang_version translate="label">
-                            <label>Boomerang JS</label>
+                            <label>Boomerang Version</label>
                             <frontend_type>select</frontend_type>
                             <source_model>basicrum_analytics/system_config_source_version</source_model>
                             <sort_order>1</sort_order>
@@ -45,23 +45,26 @@
                             <frontend_class>disabled</frontend_class>
                         </boomerang_version>
                         <beacon_endpoint translate="label">
-                            <label>Beacon Endpoint URL</label>
+                            <label>Beacon URL</label>
                             <frontend_type>text</frontend_type>
+                            <frontend_model>basicrum_analytics/adminhtml_system_config_form_field_requiredSetting</frontend_model>
+                            <backend_model>basicrum_analytics/system_config_backend_beaconEndpoint</backend_model>
                             <sort_order>2</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
-                            <comment>Example: https://www.xxxxxx.com/beacon/catcher</comment>
+                            <comment>URL where Boomerang beacons are sent. Required when Basicrum is enabled. HTTPS is enforced unless HTTP Strictness allows HTTP for local testing. Example: https://www.example.com/beacon/catcher</comment>
                         </beacon_endpoint>
                         <brum_site_id translate="label comment">
-                            <label>BasicRUM Site ID</label>
+                            <label>Brum Site ID</label>
                             <frontend_type>text</frontend_type>
+                            <frontend_model>basicrum_analytics/adminhtml_system_config_form_field_requiredSetting</frontend_model>
                             <backend_model>basicrum_analytics/system_config_backend_siteId</backend_model>
                             <sort_order>3</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
-                            <comment><![CDATA[Unique identifier provided by BasicRUM. Helps to map beacons to your site. <br /> Example: <strong>xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx</strong>]]></comment>
+                            <comment><![CDATA[Copy the UUID v4 Brum Site ID from the Basicrum backoffice. Required when Basicrum is enabled. Monitoring stays inactive until both this value and the Beacon URL are valid.<br />Example: <strong>e926c1a2-7e33-4f54-90d0-e6e31f3ad43d</strong>]]></comment>
                         </brum_site_id>
                     </fields>
                 </general>
@@ -73,16 +76,53 @@
                     <show_in_website>1</show_in_website>
                     <show_in_store>1</show_in_store>
                     <fields>
-                        <opt_in_required translate="label">
-                            <label>Opt-In Required</label>
+                        <strip_query_string translate="label comment">
+                            <label>Strip Query Strings</label>
                             <frontend_type>select</frontend_type>
-                            <frontend_model>basicrum_analytics/adminhtml_system_config_form_field_consentInfo</frontend_model>
                             <source_model>adminhtml/system_config_source_yesno</source_model>
                             <sort_order>1</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
+                            <comment>When enabled, complete query strings in page, navigation, referrer, and resource URLs are replaced with ?qs-redacted before beacons are sent. URL paths are still collected. Beacon URL parameters are not changed.</comment>
+                            <depends>
+                                <enabled>
+                                    <fieldset>general</fieldset>
+                                    <value>1</value>
+                                </enabled>
+                            </depends>
+                        </strip_query_string>
+                        <opt_in_required translate="label">
+                            <label>Require Consent Before Monitoring</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>basicrum_analytics/system_config_source_consentMode</source_model>
+                            <sort_order>2</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <comment>Choose whether Basicrum may begin monitoring immediately or must wait for explicit consent on each page.</comment>
+                            <depends>
+                                <enabled>
+                                    <fieldset>general</fieldset>
+                                    <value>1</value>
+                                </enabled>
+                            </depends>
                         </opt_in_required>
+                        <consent_integration_info>
+                            <frontend_type>note</frontend_type>
+                            <frontend_model>basicrum_analytics/adminhtml_system_config_form_field_consentInfo</frontend_model>
+                            <sort_order>3</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <depends>
+                                <enabled>
+                                    <fieldset>general</fieldset>
+                                    <value>1</value>
+                                </enabled>
+                                <opt_in_required>1</opt_in_required>
+                            </depends>
+                        </consent_integration_info>
                     </fields>
                 </privacy>
                 <wait_after_onload translate="label">
@@ -93,15 +133,22 @@
                     <show_in_website>1</show_in_website>
                     <show_in_store>1</show_in_store>
                     <fields>
-                        <enabled translate="label">
+                        <wait_enabled translate="label">
                             <label>Enable Wait After Onload</label>
                             <frontend_type>select</frontend_type>
                             <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <config_path>basicrum_analytics/wait_after_onload/enabled</config_path>
                             <sort_order>1</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
-                        </enabled>
+                            <depends>
+                                <enabled>
+                                    <fieldset>general</fieldset>
+                                    <value>1</value>
+                                </enabled>
+                            </depends>
+                        </wait_enabled>
                         <wait_ms translate="label">
                             <label>Wait After Onload (ms)</label>
                             <frontend_type>text</frontend_type>
@@ -110,9 +157,13 @@
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
-                            <comment>Milliseconds to delay the beacon to capture additional metrics.</comment>
+                            <comment>Milliseconds to delay the beacon to capture additional metrics. Values are limited to 0–30000 milliseconds (30 seconds); larger values are capped at 30000.</comment>
                             <depends>
-                                <enabled>1</enabled>
+                                <enabled>
+                                    <fieldset>general</fieldset>
+                                    <value>1</value>
+                                </enabled>
+                                <wait_enabled>1</wait_enabled>
                             </depends>
                         </wait_ms>
                     </fields>
@@ -125,15 +176,37 @@
                     <show_in_website>1</show_in_website>
                     <show_in_store>1</show_in_store>
                     <fields>
-                        <use_unminified_loaders translate="label comment">
-                            <label>Use Unminified Loaders</label>
+                        <development_mode translate="label comment">
+                            <label>HTTP Strictness</label>
                             <frontend_type>select</frontend_type>
-                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <source_model>basicrum_analytics/system_config_source_httpPolicy</source_model>
                             <sort_order>1</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
+                            <comment>Allow HTTP Beacon URLs only for local testing. Keep HTTPS enforcement enabled on production stores.</comment>
+                            <depends>
+                                <enabled>
+                                    <fieldset>general</fieldset>
+                                    <value>1</value>
+                                </enabled>
+                            </depends>
+                        </development_mode>
+                        <use_unminified_loaders translate="label comment">
+                            <label>Use Unminified Loaders</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <sort_order>2</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
                             <comment>Enable to load non-minified loader scripts for debugging purposes.</comment>
+                            <depends>
+                                <enabled>
+                                    <fieldset>general</fieldset>
+                                    <value>1</value>
+                                </enabled>
+                            </depends>
                         </use_unminified_loaders>
                     </fields>
                 </developer>

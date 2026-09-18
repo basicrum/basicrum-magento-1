@@ -2,7 +2,7 @@
 declare(strict_types=1);
 
 /**
- * BasicRum Analytics Page Type Detector Helper
+ * Basicrum Analytics Page Type Detector Helper
  */
 class BasicRum_Analytics_Helper_PageTypeDetector extends Mage_Core_Helper_Abstract
 {

@@ -1,86 +1,81 @@
 <?php
 declare(strict_types=1);
 
+// Maho can disable its global Varien aliases. Keep the Magento 1 method
+// signature compatible without requiring those aliases throughout the store.
+if (defined('MAHO_ROOT_DIR')
+    && !class_exists('Varien_Data_Form_Element_Abstract', false)
+    && class_exists('Maho\\Data\\Form\\Element\\AbstractElement')
+) {
+    class_alias('Maho\\Data\\Form\\Element\\AbstractElement', 'Varien_Data_Form_Element_Abstract');
+}
+
 /**
- * Custom renderer for consent/opt-in information in admin config
+ * Custom renderer for consent/opt-in information in admin config.
  */
 class BasicRum_Analytics_Block_Adminhtml_System_Config_Form_Field_ConsentInfo
     extends Mage_Adminhtml_Block_System_Config_Form_Field
 {
     /**
-     * Render the field with custom info box below
+     * Render consent guidance as a full-width configuration row.
      *
      * @param Varien_Data_Form_Element_Abstract $element
      * @return string
      */
-    protected function _getElementHtml(Varien_Data_Form_Element_Abstract $element): string
+    public function render(Varien_Data_Form_Element_Abstract $element): string
     {
-        $html = parent::_getElementHtml($element);
+        $rowId = htmlspecialchars('row_' . $element->getHtmlId(), ENT_QUOTES, 'UTF-8');
+        $allowSnippetId = htmlspecialchars($element->getHtmlId() . '_allow_snippet', ENT_QUOTES, 'UTF-8');
+        $denySnippetId = htmlspecialchars($element->getHtmlId() . '_deny_snippet', ENT_QUOTES, 'UTF-8');
+        $scriptUrl = htmlspecialchars(
+            Mage::getBaseUrl('js') . 'basicrum/admin/consent-info.js',
+            ENT_QUOTES,
+            'UTF-8'
+        );
 
-        $infoHtml = <<<HTML
-<div style="margin-top: 10px; padding: 12px 15px; background: #f8f8f8; border-left: 4px solid #eb5202; border-radius: 3px;">
-    <div style="font-weight: bold; margin-bottom: 8px; color: #333;">
-        JavaScript API for Cookie Consent Integration
+        return <<<HTML
+<tr id="{$rowId}">
+<td colspan="4" style="padding: 0 15px 10px;">
+<div style="box-sizing: border-box; width: 100%; min-width: 0; padding: 12px 15px; background: #f8f8f8; border-left: 4px solid #eb5202; border-radius: 3px; overflow-wrap: anywhere;">
+    <div style="font-weight: bold; margin-bottom: 8px; color: #333;">JavaScript API for Cookie Consent Integration</div>
+    <p style="color: #555;">In consent-controlled mode, Basicrum stays inert until your external consent tool explicitly allows performance monitoring on the current page. Basicrum does not store or infer a consent decision. Call the API after this loader has registered the callbacks near the end of the page; calls made before registration are not replayed.</p>
+    <div style="margin: 10px 0;">
+        <p style="margin: 0 0 10px; color: #555;">
+            <code style="display: block; margin-bottom: 3px; color: #0066cc; white-space: normal; overflow-wrap: anywhere;">OPT_IN_BASICRUM_LOADER_WRAPPER()</code>
+            Call when the external tool reports that monitoring is allowed.
+        </p>
+        <p style="margin: 0; color: #555;">
+            <code style="display: block; margin-bottom: 3px; color: #cc0000; white-space: normal; overflow-wrap: anywhere;">OPT_OUT_BASICRUM_LOADER_WRAPPER()</code>
+            Call when monitoring is denied or withdrawn. This disables future collection and removes <code>RT</code>, <code>BA</code>, and legacy Basicrum consent cookies, but it cannot retract data already sent.
+        </p>
     </div>
-    <div style="margin-bottom: 6px; color: #555;">
-        When opt-in is enabled, Boomerang will not load until consent is given. Use these global functions to integrate with your cookie consent solution:
+    <p style="color: #555;"><code>OPT_IN_BASIC_RUM()</code> and <code>OPT_OUT_BASIC_RUM()</code> remain available as backward-compatible Magento 1 aliases.</p>
+    <p style="color: #555;">A deny before the first opt-in can be followed by an allow on the same page. After monitoring has started and consent is withdrawn, reload the page before re-granting; monitoring remains disabled for the rest of that page view.</p>
+    <p style="color: #555;"><strong>Connect both decisions:</strong> place the allow snippet only in your consent tool's allow or grant callback, and the deny snippet in its deny, expiry, or withdrawal callback. Do not run the two snippets together.</p>
+    <div style="margin-top: 12px;">
+        <label for="{$allowSnippetId}" style="display: block; margin-bottom: 4px;"><strong>Allow or grant callback</strong></label>
+        <textarea id="{$allowSnippetId}" readonly="readonly" spellcheck="false" rows="3" style="box-sizing: border-box; width: 100%; max-width: 100%; padding: 8px; font-family: Monaco, Menlo, Consolas, monospace; font-size: 11px; line-height: 1.5; color: #f8f8f2; background: #2d2d2d; border: 0; border-radius: 4px; resize: vertical;">if (typeof window.OPT_IN_BASICRUM_LOADER_WRAPPER === 'function') {
+    window.OPT_IN_BASICRUM_LOADER_WRAPPER();
+}</textarea>
+        <p style="display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin: 5px 0 0;">
+            <button type="button" class="scalable basicrum-copy-consent-snippet" data-basicrum-copy-target="{$allowSnippetId}" data-copied-label="Copied" data-copy-fallback-label="Press Ctrl+C or Command+C to copy."><span>Copy allow snippet</span></button>
+            <span class="basicrum-copy-status" aria-live="polite"></span>
+        </p>
     </div>
-    <table style="margin: 10px 0; border-collapse: collapse;">
-        <tr>
-            <td style="padding: 4px 10px 4px 0; font-family: monospace; color: #0066cc; white-space: nowrap;">
-                OPT_IN_BASIC_RUM()
-            </td>
-            <td style="padding: 4px 0; color: #555;">
-                Call when user <strong>accepts</strong> cookies/tracking. Loads Boomerang and sets consent cookie.
-            </td>
-        </tr>
-        <tr>
-            <td style="padding: 4px 10px 4px 0; font-family: monospace; color: #cc0000; white-space: nowrap;">
-                OPT_OUT_BASIC_RUM()
-            </td>
-            <td style="padding: 4px 0; color: #555;">
-                Call when user <strong>rejects</strong> tracking. Disables Boomerang and clears all RUM cookies.
-            </td>
-        </tr>
-    </table>
-    <div style="margin-top: 12px; padding-top: 10px; border-top: 1px solid #ddd;">
-        <div style="font-weight: bold; margin-bottom: 6px; color: #333;">
-            Cookies Created
-        </div>
-        <table style="margin: 6px 0; border-collapse: collapse; font-size: 12px;">
-            <tr>
-                <td style="padding: 3px 10px 3px 0; font-family: monospace; color: #666;">BOOMR_CONSENT</td>
-                <td style="padding: 3px 0; color: #555;">Remembers user consent preference (expires after <strong>1 year</strong>)</td>
-            </tr>
-            <tr>
-                <td style="padding: 3px 10px 3px 0; font-family: monospace; color: #666;">RT</td>
-                <td style="padding: 3px 0; color: #555;">Round-trip timing cookie (created on opt-in, deleted on opt-out)</td>
-            </tr>
-            <tr>
-                <td style="padding: 3px 10px 3px 0; font-family: monospace; color: #666;">BA</td>
-                <td style="padding: 3px 0; color: #555;">Bandwidth/latency cookie (created on opt-in, deleted on opt-out)</td>
-            </tr>
-        </table>
+    <div style="margin-top: 14px;">
+        <label for="{$denySnippetId}" style="display: block; margin-bottom: 4px;"><strong>Deny, expiry, or withdrawal callback</strong></label>
+        <textarea id="{$denySnippetId}" readonly="readonly" spellcheck="false" rows="3" style="box-sizing: border-box; width: 100%; max-width: 100%; padding: 8px; font-family: Monaco, Menlo, Consolas, monospace; font-size: 11px; line-height: 1.5; color: #f8f8f2; background: #2d2d2d; border: 0; border-radius: 4px; resize: vertical;">if (typeof window.OPT_OUT_BASICRUM_LOADER_WRAPPER === 'function') {
+    window.OPT_OUT_BASICRUM_LOADER_WRAPPER();
+}</textarea>
+        <p style="display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin: 5px 0 0;">
+            <button type="button" class="scalable basicrum-copy-consent-snippet" data-basicrum-copy-target="{$denySnippetId}" data-copied-label="Copied" data-copy-fallback-label="Press Ctrl+C or Command+C to copy."><span>Copy deny/withdrawal snippet</span></button>
+            <span class="basicrum-copy-status" aria-live="polite"></span>
+        </p>
     </div>
-    <div style="margin-top: 12px; padding-top: 10px; border-top: 1px solid #ddd;">
-        <div style="font-weight: bold; margin-bottom: 6px; color: #333;">
-                Integration Example:
-        </div>
-    </div>
-    <div style="margin-top: 12px; padding: 10px; background: #2d2d2d; border-radius: 4px;">
-        <pre style="margin: 0; font-family: 'Monaco', 'Menlo', 'Consolas', monospace; font-size: 11px; line-height: 1.5; color: #f8f8f2; white-space: pre-wrap; word-wrap: break-word;"><span style="color: #888;">// Accept button handler</span>
-<span style="color: #66d9ef;">if</span> (<span style="color: #f92672;">typeof</span> window.OPT_IN_BASIC_RUM <span style="color: #f92672;">===</span> <span style="color: #e6db74;">'function'</span>) {
-    window.<span style="color: #a6e22e;">OPT_IN_BASIC_RUM</span>();
-}
-
-<span style="color: #888;">// Reject button handler</span>
-<span style="color: #66d9ef;">if</span> (<span style="color: #f92672;">typeof</span> window.OPT_OUT_BASIC_RUM <span style="color: #f92672;">===</span> <span style="color: #e6db74;">'function'</span>) {
-    window.<span style="color: #a6e22e;">OPT_OUT_BASIC_RUM</span>();
-}</pre>
-    </div>
+    <script type="text/javascript" src="{$scriptUrl}"></script>
 </div>
+</td>
+</tr>
 HTML;
-
-        return $html . $infoHtml;
     }
 }

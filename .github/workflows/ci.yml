@@ -1,0 +1,100 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  php:
+    name: PHP ${{ matrix.php }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        php: ["7.0", "7.4", "8.3"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          coverage: none
+      - name: PHP syntax
+        run: find app tests/php tests/platform -type f -name '*.php' -print0 | xargs -0 -n1 php -l
+      - name: PHP configuration and rendering tests
+        run: php tests/php/run.php
+
+  browser-and-package:
+    name: Browser and package checks
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - name: Install JavaScript dependencies
+        run: npm ci
+      - name: Install Chromium
+        run: npx playwright install --with-deps chromium
+      - name: Browser loader tests
+        run: npm test
+      - name: Install XML and archive tools
+        run: sudo apt-get update && sudo apt-get install -y libxml2-utils zip unzip
+      - name: XML and package checks
+        run: bash tests/check-package.sh
+
+  platform-matrix:
+    name: ${{ matrix.name }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: Magento CE 1.9.4.5 / PHP 7.4
+            platform: magento-ce
+            repository: OpenMage/magento-mirror
+            ref: 1.9.4.5
+            php: "7.4"
+          - name: OpenMage 20.18.0 / PHP 8.3
+            platform: openmage
+            repository: OpenMage/magento-lts
+            ref: v20.18.0
+            php: "8.3"
+          - name: Maho 26.9.0 / PHP 8.3
+            platform: maho
+            repository: MahoCommerce/maho
+            ref: 26.9.0
+            php: "8.3"
+    services:
+      database:
+        image: mariadb:10.11
+        env:
+          MARIADB_DATABASE: basicrum
+          MARIADB_USER: basicrum
+          MARIADB_PASSWORD: basicrum
+          MARIADB_ROOT_PASSWORD: root
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="healthcheck.sh --connect --innodb_initialized"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          repository: ${{ matrix.repository }}
+          ref: ${{ matrix.ref }}
+          path: platform
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          coverage: none
+          extensions: ctype, curl, dom, ftp, gd, iconv, intl, mbstring, mysqli, pdo_mysql, simplexml, soap, zip
+      - name: Install and verify module on ${{ matrix.name }}
+        run: bash tests/platform/run.sh "${{ matrix.platform }}" "$GITHUB_WORKSPACE/platform"
