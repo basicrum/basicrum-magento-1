@@ -52,9 +52,9 @@ class BasicRum_Analytics_Helper_Data extends Mage_Core_Helper_Abstract
             return null;
         }
 
-        // Enforce the production-safe policy even for values injected outside
-        // the admin backend model.
-        if (!$this->isDevelopmentMode()) {
+        // Enforce strict mode and preserve HTTPS storefronts' mixed-content
+        // protection, even for values injected outside the admin backend model.
+        if (!$this->isDevelopmentMode() || Mage::app()->getRequest()->isSecure()) {
             $url = preg_replace('/^http:\/\//i', 'https://', $url);
         }
 

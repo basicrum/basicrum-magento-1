@@ -119,6 +119,8 @@ class Mage_Core_Model_Config_Data
 {
     private $value;
     private $groups = array();
+    private $storeCode;
+    private $websiteCode;
 
     public function setValue($value)
     {
@@ -140,6 +142,28 @@ class Mage_Core_Model_Config_Data
     public function getGroups()
     {
         return $this->groups;
+    }
+
+    public function setStoreCode($storeCode)
+    {
+        $this->storeCode = $storeCode;
+        return $this;
+    }
+
+    public function getStoreCode()
+    {
+        return $this->storeCode;
+    }
+
+    public function setWebsiteCode($websiteCode)
+    {
+        $this->websiteCode = $websiteCode;
+        return $this;
+    }
+
+    public function getWebsiteCode()
+    {
+        return $this->websiteCode;
     }
 
     protected function _beforeSave()
@@ -225,6 +249,15 @@ class Basicrum_Test_Config
 {
     public $saved = array();
 
+    public function getNode($path)
+    {
+        if (strpos($path, 'default/') !== 0) {
+            throw new RuntimeException('Unexpected configuration path: ' . $path);
+        }
+
+        return Mage::getStoreConfig(substr($path, 8));
+    }
+
     public function saveConfig($path, $value, $scope, $scopeId)
     {
         $this->saved[] = array($path, $value, $scope, $scopeId);
@@ -286,6 +319,8 @@ class Basicrum_Test_Request
 class Basicrum_Test_App
 {
     public $request;
+    public $stores = array();
+    public $websites = array();
 
     public function __construct()
     {
@@ -295,6 +330,49 @@ class Basicrum_Test_App
     public function getRequest()
     {
         return $this->request;
+    }
+
+    public function getStore($code)
+    {
+        return $this->stores[$code];
+    }
+
+    public function getWebsite($code)
+    {
+        return $this->websites[$code];
+    }
+}
+
+class Basicrum_Test_Website
+{
+    public $config = array();
+
+    public function getConfig($path)
+    {
+        return array_key_exists($path, $this->config)
+            ? $this->config[$path] : Mage::getConfig()->getNode('default/' . $path);
+    }
+}
+
+class Basicrum_Test_Store
+{
+    public $config = array();
+    private $website;
+
+    public function __construct(Basicrum_Test_Website $website)
+    {
+        $this->website = $website;
+    }
+
+    public function getWebsite()
+    {
+        return $this->website;
+    }
+
+    public function getConfig($path)
+    {
+        return array_key_exists($path, $this->config)
+            ? $this->config[$path] : $this->website->getConfig($path);
     }
 }
 

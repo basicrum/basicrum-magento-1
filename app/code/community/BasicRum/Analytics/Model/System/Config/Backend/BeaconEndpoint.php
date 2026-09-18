@@ -33,24 +33,39 @@ class BasicRum_Analytics_Model_System_Config_Backend_BeaconEndpoint extends Mage
 
     /**
      * Resolve the HTTP policy submitted on the same configuration form.
-     * Fall back to the current scoped value when the field was not posted.
+     * Use the edited scope when omitted, or its parent when inheritance is selected.
      *
      * @return bool
      */
     private function isHttpAllowed(): bool
     {
         $groups = $this->getGroups();
+        $inherit = false;
 
         if (is_array($groups)
             && isset($groups['developer']['fields']['development_mode'])
             && is_array($groups['developer']['fields']['development_mode'])
         ) {
             $field = $groups['developer']['fields']['development_mode'];
-            if (empty($field['inherit']) && array_key_exists('value', $field)) {
+            $inherit = !empty($field['inherit']);
+            if (!$inherit && array_key_exists('value', $field)) {
                 return (string) $field['value'] === '1';
             }
         }
 
-        return Mage::getStoreConfigFlag('basicrum_analytics/developer/development_mode');
+        $path = 'basicrum_analytics/developer/development_mode';
+        $storeCode = $this->getStoreCode();
+        $websiteCode = $this->getWebsiteCode();
+
+        if ($storeCode) {
+            $store = Mage::app()->getStore($storeCode);
+            $value = $inherit ? $store->getWebsite()->getConfig($path) : $store->getConfig($path);
+        } elseif ($websiteCode && !$inherit) {
+            $value = Mage::app()->getWebsite($websiteCode)->getConfig($path);
+        } else {
+            $value = Mage::getConfig()->getNode('default/' . $path);
+        }
+
+        return (string) $value === '1';
     }
 }

@@ -541,6 +541,33 @@ $tests['helper enforces the HTTP policy and normalizes wait milliseconds'] = fun
     );
 };
 
+$tests['HTTPS storefronts never emit an HTTP collector even when HTTP is allowed'] = function () {
+    foreach (array('0', '1') as $allowHttp) {
+        foreach (array(false, true) as $secure) {
+            list($helper) = basicrum_test_reset(array(
+                'basicrum_analytics/general/beacon_endpoint' => 'HTTP://collector.example.test/beacon?site=one',
+                'basicrum_analytics/developer/development_mode' => $allowHttp,
+            ));
+            Mage::app()->getRequest()->secure = $secure;
+            $expected = $allowHttp === '1' && !$secure
+                ? 'HTTP://collector.example.test/beacon?site=one'
+                : 'https://collector.example.test/beacon?site=one';
+
+            basicrum_assert_same(
+                $expected,
+                $helper->getBeaconEndpoint(),
+                'only an insecure storefront with HTTP explicitly allowed may use an HTTP collector'
+            );
+            $snippet = (new BasicRum_Analytics_Block_Boomerang_Loader())->getBoomerangSnippet();
+            basicrum_assert_contains(
+                json_encode($expected),
+                $snippet,
+                'the rendered loader configuration must use the resolved transport policy'
+            );
+        }
+    }
+};
+
 $tests['backend models trim and validate configuration'] = function () {
     basicrum_test_reset();
 
@@ -592,6 +619,68 @@ $tests['backend models trim and validate configuration'] = function () {
         $model = new Basicrum_Test_BeaconBackend();
         $model->setValue('data:text/javascript,alert(1)')->validate();
     }, Mage_Core_Exception::class, 'Beacon backend must reject non-HTTP schemes');
+};
+
+$tests['Beacon backend resolves omitted and inherited HTTP policy at the edited scope'] = function () {
+    $path = 'basicrum_analytics/developer/development_mode';
+
+    foreach (array('0', '1') as $allowHttp) {
+        $opposite = $allowHttp === '1' ? '0' : '1';
+        // Default, website, and store policy values; edited scope; submitted field.
+        $cases = array(
+            'default omitted' => array($allowHttp, null, null, 'default', null),
+            'website omitted' => array($opposite, $allowHttp, null, 'website', null),
+            'store omitted with own value' => array($opposite, $opposite, $allowHttp, 'store', null),
+            'store omitted with inherited value' => array($opposite, $allowHttp, null, 'store', null),
+            'website now inherits default' => array(
+                $allowHttp, $opposite, null, 'website', array('inherit' => '1', 'value' => $opposite),
+            ),
+            'store now inherits website' => array(
+                $opposite, $allowHttp, $opposite, 'store', array('inherit' => '1', 'value' => $opposite),
+            ),
+            'store now inherits through website' => array(
+                $allowHttp, null, $opposite, 'store', array('inherit' => '1', 'value' => $opposite),
+            ),
+        );
+        foreach (array('default', 'website', 'store') as $scope) {
+            $cases[$scope . ' explicit submission'] = array(
+                $opposite, $opposite, $opposite, $scope, array('value' => $allowHttp),
+            );
+        }
+
+        foreach ($cases as $name => $case) {
+            list($defaultPolicy, $websitePolicy, $storePolicy, $scope, $field) = $case;
+            basicrum_test_reset(array($path => $defaultPolicy));
+            $website = new Basicrum_Test_Website();
+            $store = new Basicrum_Test_Store($website);
+            if ($websitePolicy !== null) {
+                $website->config[$path] = $websitePolicy;
+            }
+            if ($storePolicy !== null) {
+                $store->config[$path] = $storePolicy;
+            }
+            Mage::app()->websites['selected_website'] = $website;
+            Mage::app()->stores['selected_store'] = $store;
+
+            $beacon = new Basicrum_Test_BeaconBackend();
+            if ($scope !== 'default') {
+                $beacon->setWebsiteCode('selected_website');
+            }
+            if ($scope === 'store') {
+                $beacon->setStoreCode('selected_store');
+            }
+            if ($field !== null) {
+                $beacon->setGroups(array('developer' => array('fields' => array('development_mode' => $field))));
+            }
+            $beacon->setValue('http://collector.example.test/beacon?site=one')->validate();
+            $scheme = $allowHttp === '1' ? 'http' : 'https';
+            basicrum_assert_same(
+                $scheme . '://collector.example.test/beacon?site=one',
+                $beacon->getValue(),
+                $name . ' must resolve HTTP policy ' . $allowHttp . ' without using the admin store policy'
+            );
+        }
+    }
 };
 
 $tests['disabled and incomplete configurations render nothing'] = function () {
