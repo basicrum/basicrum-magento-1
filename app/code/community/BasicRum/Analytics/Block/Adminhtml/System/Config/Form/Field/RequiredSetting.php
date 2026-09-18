@@ -16,10 +16,10 @@ if (defined('MAHO_ROOT_DIR')
 class BasicRum_Analytics_Block_Adminhtml_System_Config_Form_Field_RequiredSetting
     extends Mage_Adminhtml_Block_System_Config_Form_Field
 {
-    private const ENABLED_FIELD_ID = 'basicrum_analytics_general_enabled';
-    private const BEACON_FIELD_ID = 'basicrum_analytics_general_beacon_endpoint';
-    private const SITE_ID_FIELD_ID = 'basicrum_analytics_general_brum_site_id';
-    private const CONSENT_FIELD_ID = 'basicrum_analytics_privacy_opt_in_required';
+    const ENABLED_FIELD_ID = 'basicrum_analytics_general_enabled';
+    const BEACON_FIELD_ID = 'basicrum_analytics_general_beacon_endpoint';
+    const SITE_ID_FIELD_ID = 'basicrum_analytics_general_brum_site_id';
+    const CONSENT_FIELD_ID = 'basicrum_analytics_privacy_opt_in_required';
 
     /**
      * Render the native field row and monitoring status after the Site ID.
