@@ -24,6 +24,15 @@ if [[ ! -f "$platform_root/app/Mage.php" ]]; then
     exit 1
 fi
 
+if [[ -n "${BASICRUM_TEST_RELEASE_ZIP:-}" ]]; then
+    bash "$plugin_root/tools/verify-release.sh" "$BASICRUM_TEST_RELEASE_ZIP"
+    package_tmp_dir="$(mktemp -d "${TMPDIR:-/tmp}/basicrum-platform-release.XXXXXX")"
+    trap 'rm -rf -- "$package_tmp_dir"' EXIT
+    unzip -q "$BASICRUM_TEST_RELEASE_ZIP" -d "$package_tmp_dir"
+    # No source-checkout fallback: every runtime file below comes from the ZIP.
+    plugin_root="$package_tmp_dir/basicrum-magento-1"
+fi
+
 while read -r source_path destination_path extra; do
     if [[ -z "${source_path:-}" || "${source_path:0:1}" == "#" ]]; then
         continue

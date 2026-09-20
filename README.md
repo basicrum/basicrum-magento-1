@@ -19,6 +19,12 @@ modman clone https://github.com/basicrum/basicrum-magento-1.git
 
 ### Manual installation
 
+Download the versioned `basicrum-magento-1-<version>.zip` asset and its `.sha256`
+file from the [GitHub releases](https://github.com/basicrum/basicrum-magento-1/releases).
+Verify the checksum, then extract the ZIP. The extension is inside the
+`basicrum-magento-1/` directory. GitHub's automatic source-code archives are
+repository snapshots, not the filtered installation package.
+
 Copy these paths into the matching locations under the Magento root:
 
 - `app/code/community/BasicRum/Analytics`
@@ -166,7 +172,8 @@ Script placement and callback registration timing remain Magento-specific;
 this port does not add automatic consent-provider adapters or change the
 underlying Boomerang shutdown behavior.
 
-Run XML, Modman, Boomerang checksum, and temporary package-archive verification with:
+Run XML, Modman, Boomerang checksum, and temporary release-archive verification
+with Node.js 20+, `xmllint`, `zip`, `unzip`, and `sha256sum` or `shasum` installed:
 
 ```bash
 bash tests/check-package.sh
@@ -180,7 +187,8 @@ npm run build:loaders
 
 GitHub Actions runs PHP syntax/tests on PHP 7.0, 7.4, and 8.3, the Playwright suite, XML validation, and packaging checks.
 
-It also installs the extension into a real application and boots the storefront for this pinned compatibility matrix:
+It also installs the built release ZIP (not loose files from the checkout) into
+a real application and boots the storefront for this pinned compatibility matrix:
 
 | Platform | Runtime | Coverage |
 |----------|---------|----------|
@@ -190,6 +198,60 @@ It also installs the extension into a real application and boots the storefront 
 The real-install jobs exercise a fresh privacy-first installation, storefront-triggered upgrades from a simulated pre-1.1.0 database with and without explicit consent or legacy HTTP behavior, incomplete and unsafe configuration, HTTPS enforcement and development HTTP mode, native admin saves with explicit/omitted/newly inherited HTTP policy at default/website/store scopes, immediate and consent-controlled rendering, query-string privacy, the 30-second wait cap, default/website/store inheritance, frontend and admin block resolution, callback-compatible loader delivery, and disabled-mode suppression. Platform versions are deliberately pinned so upstream releases cannot silently change the test baseline; updates should be made explicitly after local validation.
 
 For a local run, provide a disposable platform checkout and an empty MariaDB database, then run—for example—`bash tests/platform/run.sh openmage /path/to/openmage`. The default database is `basicrum` at `127.0.0.1` with username and password `basicrum`; override it with `BASICRUM_TEST_DB_HOST`, `BASICRUM_TEST_DB_NAME`, `BASICRUM_TEST_DB_USER`, and `BASICRUM_TEST_DB_PASSWORD`. The runner deploys the extension into the checkout and installs the application, so neither target should contain data that must be preserved.
+
+Set `BASICRUM_TEST_RELEASE_ZIP=/absolute/path/to/basicrum-magento-1-1.1.0.zip`
+to exercise a packaged installation locally. Keep its `.sha256` alongside it.
+The runner verifies every archive entry against the checkout before deploying;
+an invalid archive fails without falling back to source files.
+
+## Release artifacts
+
+The release process follows the WordPress plugin's package-and-smoke-test
+approach, adapted to Magento's `app/` and `js/` layout and compatibility matrix.
+
+- Ordinary branch and pull-request CI uploads a candidate ZIP and SHA-256 file
+  as the `basicrum-magento-1-release` Actions artifact, retained for 14 days.
+  These are test candidates; check the entire workflow result before using them.
+- Pushing a version tag such as `v1.1.0` triggers **Release Extension**, which
+  calls the same CI workflow. Only after all PHP, browser, packaging, Magento CE,
+  and OpenMage checks pass does it create a GitHub Release with generated notes
+  and attach `basicrum-magento-1-1.1.0.zip` and its `.sha256` file.
+- Tags such as `v1.1.0-alpha.1`, `v1.1.0-beta.1`, and `v1.1.0-rc.1` follow the
+  same gates and are marked as prereleases, not latest stable releases.
+  Their base version must match the module version; the suffix does not alter
+  Magento's setup version. Unsupported suffixes and mismatched versions fail.
+- Creating or editing a release in the GitHub UI is not a separate trigger.
+  Use a tag push. A literal `/release` is not the release-tag convention.
+- The published ZIP is the exact artifact installed by both platform jobs;
+  the publishing job verifies it again and never rebuilds it. Only that job
+  receives `contents: write`; test jobs remain read-only. Newly added actions
+  are pinned to full commit SHAs.
+
+Before tagging, keep the module version in `app/code/community/BasicRum/Analytics/etc/config.xml`,
+the **Version** section below, `package.json`, and both root versions in
+`package-lock.json` synchronized. Commit and push the reviewed release changes,
+then push the version tag. Do not move a published tag to another commit.
+The workflow files must already be present in the tagged commit. No tag or
+release is created by the local build commands.
+
+Build and verify locally:
+
+```bash
+node --test tests/release/version.test.js
+bash tests/release/package.sh
+bash tests/check-package.sh
+BASICRUM_RELEASE_TAG=v1.1.0 bash tools/build-release.sh
+bash tools/verify-release.sh release/basicrum-magento-1-1.1.0.zip
+(cd release && shasum -a 256 -c basicrum-magento-1-1.1.0.zip.sha256)
+```
+
+`tools/build-release.sh` optionally accepts an output directory. It refuses to
+overwrite an existing version's ZIP/checksum; use a fresh directory for a new
+build. The default `release/` directory is ignored by Git. The package includes
+only the Modman-listed runtime files, `modman`, README, license, and provenance
+notice. Tests, CI files, Node dependencies/manifests, and local configuration
+are excluded. Changes to the package boundary must keep Modman and the archive
+layout aligned.
 
 ## Bundled Boomerang provenance
 
