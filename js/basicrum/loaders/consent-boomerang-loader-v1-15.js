@@ -1,22 +1,26 @@
-// Ultra-concise version
+/*! Basicrum consent wrapper: exposes OPT_IN_BASICRUM_LOADER_WRAPPER() and OPT_OUT_BASICRUM_LOADER_WRAPPER(). */
 (function(mainWin) {
-  function loadBoomr(w) {
-    // Your opted-in code here
+  // Consent wrapper opt-in callback: execute the standard Boomerang loader.
+  mainWin.OPT_IN_BASICRUM_LOADER_WRAPPER = function() {
+    // Keep the block between these markers byte-for-byte identical to
+    // boomerang-loader-v15.js. The browser tests enforce this contract.
+    /* BEGIN BASICRUM STANDARD LOADER */
+(function() {
     // Boomerang Loader Snippet version 15
-    if (w.BOOMR && (w.BOOMR.version || w.BOOMR.snippetExecuted)) {
+    if (window.BOOMR && (window.BOOMR.version || window.BOOMR.snippetExecuted)) {
         return;
     }
 
-    w.BOOMR = w.BOOMR || {};
+    window.BOOMR = window.BOOMR || {};
 
     // Ensure url is an own property (protect against prototype pollution)
-    if (!Object.prototype.hasOwnProperty.call(w.BOOMR, "url") || !w.BOOMR.url) {
+    if (!Object.prototype.hasOwnProperty.call(window.BOOMR, "url") || !window.BOOMR.url) {
         return;
     }
 
-    w.BOOMR.snippetStart = new Date().getTime();
-    w.BOOMR.snippetExecuted = true;
-    w.BOOMR.snippetVersion = 15;
+    window.BOOMR.snippetStart = new Date().getTime();
+    window.BOOMR.snippetExecuted = true;
+    window.BOOMR.snippetVersion = 15;
 
     // document.currentScript is supported in all browsers other than IE
     var where = document.currentScript || document.getElementsByTagName("script")[0],
@@ -36,7 +40,7 @@
         var script = document.createElement("script");
 
         script.id = "boomr-scr-as";
-        script.src = w.BOOMR.url;
+        script.src = window.BOOMR.url;
 
         // Not really needed since dynamic scripts are async by default and the script is already in cache at this point,
         // but some naive parsers will see a missing async attribute and think we're not async
@@ -55,16 +59,16 @@
         var dom,
         doc = document,
         bootstrap, iframe, iframeStyle,
-        win = w;
+        win = window;
 
-        w.BOOMR.snippetMethod = wasFallback ? "if" : "i";
+        window.BOOMR.snippetMethod = wasFallback ? "if" : "i";
 
         // Adds Boomerang within the iframe
         bootstrap = function(parent, scriptId) {
         var script = doc.createElement("script");
 
         script.id = scriptId || "boomr-if-as";
-        script.src = w.BOOMR.url;
+        script.src = window.BOOMR.url;
 
         BOOMR_lstart = new Date().getTime();
 
@@ -76,8 +80,8 @@
         // * IE 6/7 don't support 'about:blank' for an iframe src (it triggers warnings on secure sites)
         // * IE 8 required a doc write call for it to work, which is bad practice
         // This means loading on IE 6/7/8 may cause SPoF.
-        if (!w.addEventListener && w.attachEvent && navigator.userAgent.match(/MSIE [678]\./)) {
-            w.BOOMR.snippetMethod = "s";
+        if (!window.addEventListener && window.attachEvent && navigator.userAgent.match(/MSIE [678]\./)) {
+            window.BOOMR.snippetMethod = "s";
 
             bootstrap(parentNode, "boomr-async");
 
@@ -152,18 +156,18 @@
     typeof link.relList.supports === "function" &&
     link.relList.supports("preload") &&
     ("as" in link)) {
-        w.BOOMR.snippetMethod = "p";
+        window.BOOMR.snippetMethod = "p";
 
         // Set attributes to trigger a Preload
-        link.href = w.BOOMR.url;
+        link.href = window.BOOMR.url;
         link.rel  = "preload";
         link.as   = "script";
 
         // Add our script tag if successful, fallback to iframe if not
         link.addEventListener("load", promote);
         link.addEventListener("error", function() {
-        iframeLoader(true);
-    });
+            iframeLoader(true);
+        });
 
         // Have a fallback in case Preload does nothing or is slow
         setTimeout(function() {
@@ -185,16 +189,18 @@
 
     // Save when the onload event happened, in case this is a non-NavigationTiming browser
     function boomerangSaveLoadTime(e) {
-        w.BOOMR_onload = (e && e.timeStamp) || new Date().getTime();
+        window.BOOMR_onload = (e && e.timeStamp) || new Date().getTime();
     }
 
-    if (w.addEventListener) {
-        w.addEventListener("load", boomerangSaveLoadTime, false);
+    if (window.addEventListener) {
+        window.addEventListener("load", boomerangSaveLoadTime, false);
     }
-    else if (w.attachEvent) {
-        w.attachEvent("onload", boomerangSaveLoadTime);
+    else if (window.attachEvent) {
+        window.attachEvent("onload", boomerangSaveLoadTime);
     }
-  }
+})();
+    /* END BASICRUM STANDARD LOADER */
+  };
 
   // Remove cookies created by older Basicrum consent loaders and Boomerang.
   function removeCookie(name) {
@@ -211,11 +217,6 @@
       }
     }
   }
-
-  // Callback function to opt-in to Boomerang tracking.
-  mainWin.OPT_IN_BASICRUM_LOADER_WRAPPER = function() {
-    loadBoomr(mainWin);
-  };
 
   // Consent wrapper opt-out callback: disable collection and remove cookies.
   mainWin.OPT_OUT_BASICRUM_LOADER_WRAPPER = function() {

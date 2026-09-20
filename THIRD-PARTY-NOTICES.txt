@@ -22,5 +22,6 @@ The Boomerang copyright notice and license remain applicable to the bundled Boom
 - License: BSD License
 - License text: `js/basicrum/LICENSE.txt`
 - Provenance: Boomerang Loader Snippet version 15, adapted from the loader distributed by the Akamai Boomerang project. The consent wrapper adds Basicrum-owned lifecycle and withdrawal handling around that loader.
+- Canonical Basicrum implementation: `plugins/basicrum/assets/js/loaders/` at commit `64f19d9e5a9fbe580c12c19796e86e3ad0dd17ff` in [Basicrum WordPress](https://github.com/basicrum/basicrum-wordpress/tree/64f19d9e5a9fbe580c12c19796e86e3ad0dd17ff). The standard loader and the standard-loader block inside the consent wrapper are copied unchanged. Magento retains only its legacy callback aliases, legacy consent-cookie cleanup, and existing delayed-beacon withdrawal protection around the canonical wrapper. `tests/js/wordpress-parity.spec.js` pins upstream source and minified hashes and verifies these explicit differences.
 
 The Akamai Boomerang copyright notice and BSD license remain applicable to the loader code. Basicrum-owned adaptations remain under the extension license without changing the license of the original loader snippet.

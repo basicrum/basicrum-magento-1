@@ -140,6 +140,33 @@ npx playwright install chromium
 npm test
 ```
 
+The WordPress loaders are the source of truth. `tests/js/wordpress-parity.spec.js`
+pins their source/minified SHA-256 hashes and the Boomerang bundle to WordPress
+commit `64f19d9e5a9fbe580c12c19796e86e3ad0dd17ff`. It also requires the consent
+wrapper to embed the standard loader byte-for-byte. These checks run in the
+normal CI suite without a WordPress checkout or network access.
+
+The only allowed consent-wrapper additions are Magento's legacy callback
+aliases, legacy consent-cookie cleanup, and its existing Wait After Onload
+timer cancellation/withdrawal guard. The parity test removes only these exact
+additions before checking the WordPress hash; unexpected differences fail.
+General loader behavior changes should be reviewed in WordPress first, then
+ported here with the baseline updated explicitly. Do not remove Magento's
+existing withdrawal protection just to match the current WordPress wrapper.
+
+To also verify the baseline against a local WordPress checkout:
+
+```bash
+BASICRUM_WORDPRESS_ROOT=/path/to/basicrum-wordpress npm test
+```
+
+When updating the baseline, compare both WordPress loaders, retain only the
+documented Magento additions, regenerate the minified files, update the pinned
+revision/hashes and notices, and run the browser suite against the real bundle.
+Script placement and callback registration timing remain Magento-specific;
+this port does not add automatic consent-provider adapters or change the
+underlying Boomerang shutdown behavior.
+
 Run XML, Modman, Boomerang checksum, and temporary package-archive verification with:
 
 ```bash
