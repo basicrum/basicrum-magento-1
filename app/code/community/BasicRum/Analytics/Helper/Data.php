@@ -132,7 +132,7 @@ class BasicRum_Analytics_Helper_Data extends Mage_Core_Helper_Abstract
     }
 
     /**
-     * Check whether HTTP Beacon URLs are explicitly allowed for local testing.
+     * Check whether HTTP Beacon Endpoints are explicitly allowed for local testing.
      *
      * @return bool
      */

@@ -82,13 +82,13 @@ class BasicRum_Analytics_Block_Adminhtml_System_Config_Form_Field_RequiredSettin
         if ($this->isBeaconElement($element)) {
             if ($value === '') {
                 return Mage::helper('basicrum_analytics')->__(
-                    'Beacon URL is required while monitoring is enabled. Monitoring remains inactive.'
+                    'Beacon Endpoint is required while monitoring is enabled. Monitoring remains inactive.'
                 );
             }
 
             if (!BasicRum_Analytics_Helper_Data::isValidBeaconEndpoint($value)) {
                 return Mage::helper('basicrum_analytics')->__(
-                    'Enter a valid HTTP or HTTPS Beacon URL. Monitoring remains inactive.'
+                    'Enter a valid HTTP or HTTPS Beacon Endpoint. Monitoring remains inactive.'
                 );
             }
         }

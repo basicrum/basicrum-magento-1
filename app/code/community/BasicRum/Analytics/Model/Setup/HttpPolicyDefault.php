@@ -2,12 +2,12 @@
 declare(strict_types=1);
 
 /**
- * Upgrade policy for HTTP Beacon URLs that predate HTTP Strictness.
+ * Upgrade policy for HTTP Beacon Endpoints that predate HTTP Strictness.
  */
 class BasicRum_Analytics_Model_Setup_HttpPolicyDefault
 {
     /**
-     * Return scoped policy values for existing Beacon URLs.
+     * Return scoped policy values for existing Beacon Endpoints.
      *
      * Existing explicit HTTP-policy values always win. Invalid and duplicate
      * rows are ignored so the installer cannot write outside Magento scopes.

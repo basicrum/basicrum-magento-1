@@ -45,7 +45,7 @@
                             <frontend_class>disabled</frontend_class>
                         </boomerang_version>
                         <beacon_endpoint translate="label">
-                            <label>Beacon URL</label>
+                            <label>Beacon Endpoint</label>
                             <frontend_type>text</frontend_type>
                             <frontend_model>basicrum_analytics/adminhtml_system_config_form_field_requiredSetting</frontend_model>
                             <backend_model>basicrum_analytics/system_config_backend_beaconEndpoint</backend_model>
@@ -64,7 +64,7 @@
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
-                            <comment><![CDATA[Copy the UUID v4 Brum Site ID from the Basicrum backoffice. Required when Basicrum is enabled. Monitoring stays inactive until both this value and the Beacon URL are valid.<br />Example: <strong>e926c1a2-7e33-4f54-90d0-e6e31f3ad43d</strong>]]></comment>
+                            <comment><![CDATA[Copy the UUID v4 Brum Site ID from the Basicrum backoffice. Required when Basicrum is enabled. Monitoring stays inactive until both this value and the Beacon Endpoint are valid.<br />Example: <strong>e926c1a2-7e33-4f54-90d0-e6e31f3ad43d</strong>]]></comment>
                         </brum_site_id>
                         <strip_query_string translate="label comment">
                             <label>Strip Query Strings</label>
@@ -75,7 +75,7 @@
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
-                            <comment>When enabled, complete query strings in page, navigation, referrer, and resource URLs are replaced with ?qs-redacted before beacons are sent. URL paths are still collected. Beacon URL parameters are not changed.</comment>
+                            <comment>When enabled, complete query strings in page, navigation, referrer, and resource URLs are replaced with ?qs-redacted before beacons are sent. URL paths are still collected. Beacon Endpoint parameters are not changed.</comment>
                             <depends>
                                 <enabled>
                                     <fieldset>general</fieldset>
@@ -176,7 +176,7 @@
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
-                            <comment>Allow HTTP Beacon URLs only for local testing. Keep HTTPS enforcement enabled on production stores.</comment>
+                            <comment>Allow HTTP Beacon Endpoints only for local testing. Keep HTTPS enforcement enabled on production stores.</comment>
                             <depends>
                                 <enabled>
                                     <fieldset>general</fieldset>

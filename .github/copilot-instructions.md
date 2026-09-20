@@ -72,7 +72,7 @@ Access via `Mage::getStoreConfig()` or `Mage::getStoreConfigFlag()`:
 | `basicrum_analytics/general/brum_site_id` | string | Required Basicrum backend UUID v4 |
 | `basicrum_analytics/wait_after_onload/enabled` | bool | Enable delayed beacon sending |
 | `basicrum_analytics/wait_after_onload/wait_ms` | int | Milliseconds to wait before sending beacon |
-| `basicrum_analytics/developer/development_mode` | bool | Allow HTTP Beacon URLs only for local testing |
+| `basicrum_analytics/developer/development_mode` | bool | Allow HTTP Beacon Endpoints only for local testing |
 | `basicrum_analytics/developer/use_unminified_loaders` | bool | Load non-minified JS for debugging |
 
 ### JavaScript Assets
@@ -102,7 +102,7 @@ The block is added to the `before_body_end` reference in `basicrum_analytics.xml
    - `config.xml`: Module version, models, blocks, helpers, events.
    - `system.xml`: Backend configuration fields (ACL, Scope).
    - `adminhtml.xml`: Admin menu items and ACL resources.
-   - Keep Beacon URL and Brum Site ID visible while the module is disabled. Privacy controls and consent guidance live in General Settings, with `config_path` preserving the established `basicrum_analytics/privacy/*` storage paths. Runtime-only privacy, wait, and developer fields depend on `basicrum_analytics/general/enabled`; preserve those dependencies and Magento's scoped inheritance behavior. The wait toggle uses the unique admin field ID `wait_enabled` with `config_path` mapped to the established public path `basicrum_analytics/wait_after_onload/enabled`, avoiding duplicate dependency node names in Magento's merged XML.
+   - Keep Beacon Endpoint and Brum Site ID visible while the module is disabled. Privacy controls and consent guidance live in General Settings, with `config_path` preserving the established `basicrum_analytics/privacy/*` storage paths. Runtime-only privacy, wait, and developer fields depend on `basicrum_analytics/general/enabled`; preserve those dependencies and Magento's scoped inheritance behavior. The wait toggle uses the unique admin field ID `wait_enabled` with `config_path` mapped to the established public path `basicrum_analytics/wait_after_onload/enabled`, avoiding duplicate dependency node names in Magento's merged XML.
 
 ## Important Patterns
 - **Helpers**: Always access helpers via `Mage::helper('basicrum_analytics')`.

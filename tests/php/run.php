@@ -247,7 +247,7 @@ $tests['admin hides runtime controls while monitoring is disabled'] = function (
         'General Settings introduction must identify the product'
     );
     basicrum_assert_same('Enable Basicrum', (string) $generalFields->enabled->label, 'enable label must name Basicrum');
-    basicrum_assert_same('Beacon URL', (string) $generalFields->beacon_endpoint->label, 'Beacon label must match WordPress');
+    basicrum_assert_same('Beacon Endpoint', (string) $generalFields->beacon_endpoint->label, 'Beacon label must match the Basicrum backoffice');
     basicrum_assert_same('Brum Site ID', (string) $generalFields->brum_site_id->label, 'Site ID label must match WordPress');
     basicrum_assert_same(
         'Boomerang Version',
@@ -270,7 +270,7 @@ $tests['admin hides runtime controls while monitoring is disabled'] = function (
     basicrum_assert_same(
         array(),
         basicrum_config_dependency_map($generalFields->beacon_endpoint, 'general'),
-        'Beacon URL must remain available for preconfiguration'
+        'Beacon Endpoint must remain available for preconfiguration'
     );
     basicrum_assert_same(
         array(),
@@ -342,13 +342,13 @@ $tests['enabled incomplete configuration is visibly inactive'] = function () use
     $beaconHtml = $renderer->render($beacon);
     $siteIdHtml = $renderer->render($siteId);
 
-    basicrum_assert_contains('aria-required="true"', $beaconHtml, 'enabled Beacon URL must be required');
-    basicrum_assert_contains('aria-invalid="true"', $beaconHtml, 'missing Beacon URL must be invalid');
-    basicrum_assert_contains('validation-failed', $beaconHtml, 'missing Beacon URL must be highlighted');
+    basicrum_assert_contains('aria-required="true"', $beaconHtml, 'enabled Beacon Endpoint must be required');
+    basicrum_assert_contains('aria-invalid="true"', $beaconHtml, 'missing Beacon Endpoint must be invalid');
+    basicrum_assert_contains('validation-failed', $beaconHtml, 'missing Beacon Endpoint must be highlighted');
     basicrum_assert_contains(
-        'Beacon URL is required while monitoring is enabled',
+        'Beacon Endpoint is required while monitoring is enabled',
         $beaconHtml,
-        'missing Beacon URL must have field-level guidance'
+        'missing Beacon Endpoint must have field-level guidance'
     );
     basicrum_assert_contains('aria-invalid="true"', $siteIdHtml, 'missing Site ID must be invalid');
     basicrum_assert_contains(
@@ -377,7 +377,7 @@ $tests['enabled incomplete configuration is visibly inactive'] = function () use
     basicrum_assert_same(
         'basicrum_analytics/adminhtml_system_config_form_field_requiredSetting',
         (string) $generalFields->beacon_endpoint->frontend_model,
-        'Beacon URL must use the required-setting renderer'
+        'Beacon Endpoint must use the required-setting renderer'
     );
     basicrum_assert_same(
         'basicrum_analytics/adminhtml_system_config_form_field_requiredSetting',
@@ -487,9 +487,9 @@ $tests['admin required-setting feedback respects validity enabled state and reso
 
     $invalidHtml = $renderer->render($invalidBeacon) . $renderer->render($invalidSiteId);
     basicrum_assert_contains(
-        'Enter a valid HTTP or HTTPS Beacon URL',
+        'Enter a valid HTTP or HTTPS Beacon Endpoint',
         $invalidHtml,
-        'invalid Beacon URL must have field-level guidance'
+        'invalid Beacon Endpoint must have field-level guidance'
     );
     basicrum_assert_contains(
         'Enter a valid UUID v4 Brum Site ID',
@@ -515,11 +515,11 @@ $tests['runtime validation follows the backend contract'] = function () {
     );
     basicrum_assert_true(
         BasicRum_Analytics_Helper_Data::isValidBeaconEndpoint('https://collector.example.test/beacon?key=value'),
-        'HTTPS Beacon URL must be accepted'
+        'HTTPS Beacon Endpoint must be accepted'
     );
     basicrum_assert_true(
         BasicRum_Analytics_Helper_Data::isValidBeaconEndpoint('http://localhost:8080/beacon'),
-        'HTTP Beacon URL must remain available for compatible development setups'
+        'HTTP Beacon Endpoint must remain available for compatible development setups'
     );
     basicrum_assert_same(
         false,
@@ -542,7 +542,7 @@ $tests['helper enforces the HTTP policy and normalizes wait milliseconds'] = fun
     basicrum_assert_same(
         'https://collector.example.test/beacon',
         $helper->getBeaconEndpoint(),
-        'strict mode must upgrade the Beacon URL even on an HTTP storefront'
+        'strict mode must upgrade the Beacon Endpoint even on an HTTP storefront'
     );
     basicrum_assert_same(30000, $helper->getWaitAfterOnloadMilliseconds(), 'wait value must be capped');
     basicrum_assert_same(false, $helper->shouldStripQueryString(), 'query stripping must remain disabled by default');
@@ -559,7 +559,7 @@ $tests['helper enforces the HTTP policy and normalizes wait milliseconds'] = fun
     basicrum_assert_same(
         'http://127.0.0.1:8080/beacon?site=one',
         $developmentHelper->getBeaconEndpoint(),
-        'development mode must retain an explicitly configured HTTP Beacon URL'
+        'development mode must retain an explicitly configured HTTP Beacon Endpoint'
     );
 };
 
@@ -712,10 +712,10 @@ $tests['disabled and incomplete configurations render nothing'] = function () {
     basicrum_assert_same('', $block->getBoomerangSnippet(), 'disabled configuration must emit no scripts');
 
     basicrum_test_reset(array('basicrum_analytics/general/beacon_endpoint' => ''));
-    basicrum_assert_same('', $block->getBoomerangSnippet(), 'missing Beacon URL must emit no scripts');
+    basicrum_assert_same('', $block->getBoomerangSnippet(), 'missing Beacon Endpoint must emit no scripts');
 
     basicrum_test_reset(array('basicrum_analytics/general/beacon_endpoint' => 'javascript:alert(1)'));
-    basicrum_assert_same('', $block->getBoomerangSnippet(), 'invalid Beacon URL must emit no scripts');
+    basicrum_assert_same('', $block->getBoomerangSnippet(), 'invalid Beacon Endpoint must emit no scripts');
 
     basicrum_test_reset(array('basicrum_analytics/general/brum_site_id' => ''));
     basicrum_assert_same('', $block->getBoomerangSnippet(), 'missing Site ID must emit no scripts');
@@ -734,7 +734,7 @@ $tests['valid immediate and consent configurations select the expected loader'] 
     basicrum_assert_contains('boomerang-loader-v15.min.js', $immediate, 'immediate mode loader is required');
     basicrum_assert_not_contains('consent-boomerang-loader', $immediate, 'immediate mode must not use consent loader');
     basicrum_assert_contains('brum_site_id', $immediate, 'Site ID must be rendered');
-    basicrum_assert_contains('beacon_url', $immediate, 'Beacon URL must be rendered');
+    basicrum_assert_contains('beacon_url', $immediate, 'Beacon Endpoint must be rendered');
     basicrum_assert_contains(
         '"strip_query_string":false',
         $immediate,
@@ -791,7 +791,7 @@ $tests['rendered values are JSON serialized for script safety'] = function () {
     $html = (new BasicRum_Analytics_Block_Boomerang_Loader())->getBoomerangSnippet();
     basicrum_assert_not_contains('</script><script>alert', $html, 'dynamic values must not terminate the script');
     basicrum_assert_contains('\\u003C\\/script\\u003E', $html, 'HTML-significant characters must be hex escaped');
-    basicrum_assert_contains('\\u0026', $html, 'ampersands in Beacon URLs must be hex escaped');
+    basicrum_assert_contains('\\u0026', $html, 'ampersands in Beacon Endpoints must be hex escaped');
 };
 
 $tests['privacy default migration distinguishes new installs and upgrades'] = function () {
@@ -812,7 +812,7 @@ $tests['privacy default migration distinguishes new installs and upgrades'] = fu
     );
 };
 
-$tests['HTTP policy migration preserves each explicit Beacon URL scope'] = function () {
+$tests['HTTP policy migration preserves each explicit Beacon Endpoint scope'] = function () {
     $policies = BasicRum_Analytics_Model_Setup_HttpPolicyDefault::getValuesToPersist(
         array(
             array('scope' => 'default', 'scope_id' => '0', 'value' => 'http://collector.example.test/beacon'),
@@ -921,7 +921,7 @@ $tests['setup installer persists versioned defaults through Magento APIs'] = fun
         basicrum_assert_same(
             array(array('path = ?', $beaconPath)),
             $setup->connection->selects[2]->where,
-            $caseName . ': HTTP preservation must inspect only Beacon URL rows'
+            $caseName . ': HTTP preservation must inspect only Beacon Endpoint rows'
         );
         basicrum_assert_same(
             array(array('path = ?', $httpPolicyPath)),

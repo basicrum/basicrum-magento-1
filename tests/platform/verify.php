@@ -69,7 +69,7 @@ basicrum_platform_assert(
 $beaconBackend = Mage::getModel('basicrum_analytics/system_config_backend_beaconEndpoint');
 basicrum_platform_assert(
     $beaconBackend instanceof BasicRum_Analytics_Model_System_Config_Backend_BeaconEndpoint,
-    'Magento did not resolve the Basicrum Beacon URL backend model'
+    'Magento did not resolve the Basicrum Beacon Endpoint backend model'
 );
 
 $httpPolicy = Mage::getModel('basicrum_analytics/system_config_source_httpPolicy');
@@ -89,13 +89,13 @@ $generalEnabledOnly = array('general/enabled' => '1');
 
 basicrum_platform_assert_same('Basicrum Settings', (string) $adminSection->label, 'admin page label is stale');
 basicrum_platform_assert_same('Enable Basicrum', (string) $generalFields->enabled->label, 'enable label is stale');
-basicrum_platform_assert_same('Beacon URL', (string) $generalFields->beacon_endpoint->label, 'Beacon label is stale');
+basicrum_platform_assert_same('Beacon Endpoint', (string) $generalFields->beacon_endpoint->label, 'Beacon label is stale');
 basicrum_platform_assert_same('Brum Site ID', (string) $generalFields->brum_site_id->label, 'Site ID label is stale');
 
 basicrum_platform_assert_same(
     array(),
     basicrum_platform_dependency_map($generalFields->beacon_endpoint, 'general'),
-    'Beacon URL was hidden behind the module enabled state'
+    'Beacon Endpoint was hidden behind the module enabled state'
 );
 basicrum_platform_assert_same(
     array(),
@@ -195,7 +195,7 @@ $strictHttp = Mage::app()->getLayout()
     ->getBoomerangSnippet();
 basicrum_platform_assert(
     strpos($strictHttp, 'https:\/\/collector.example.test\/beacon?site=one') !== false,
-    'strict runtime policy did not upgrade an HTTP Beacon URL'
+    'strict runtime policy did not upgrade an HTTP Beacon Endpoint'
 );
 
 basicrum_platform_save(array(
@@ -207,7 +207,7 @@ $developmentHttp = Mage::app()->getLayout()
     ->getBoomerangSnippet();
 basicrum_platform_assert(
     strpos($developmentHttp, 'http:\/\/collector.example.test\/beacon?site=one') !== false,
-    'development HTTP policy did not preserve the configured Beacon URL'
+    'development HTTP policy did not preserve the configured Beacon Endpoint'
 );
 
 basicrum_platform_save(array(
@@ -218,7 +218,7 @@ basicrum_platform_reboot();
 $invalid = Mage::app()->getLayout()
     ->createBlock('basicrum_analytics/boomerang_loader')
     ->getBoomerangSnippet();
-basicrum_platform_assert_same('', $invalid, 'unsafe Beacon URL emitted monitoring code');
+basicrum_platform_assert_same('', $invalid, 'unsafe Beacon Endpoint emitted monitoring code');
 
 $store = Mage::app()->getStore('default');
 $storeId = (int) $store->getId();

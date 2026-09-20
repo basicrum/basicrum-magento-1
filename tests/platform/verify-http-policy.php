@@ -137,7 +137,7 @@ try {
         basicrum_platform_assert_same(
             $expectedEndpoint,
             $connection->fetchOne($select),
-            $case['name'] . ': backend saved the wrong Beacon URL'
+            $case['name'] . ': backend saved the wrong Beacon Endpoint'
         );
 
         $select = $connection->select()

@@ -22,7 +22,7 @@ Legend:
 ## Core configuration
 
 - [x] Provide an Enable Monitoring control.
-- [x] Provide a required Beacon URL field.
+- [x] Provide a required Beacon Endpoint field.
 - [x] Provide a required Brum Site ID field with UUID v4 guidance.
 - [x] Display the bundled Boomerang version.
   - Partial: WordPress presents this as read-only text; Magento uses a disabled
@@ -68,11 +68,11 @@ Legend:
 - [x] Explain safe re-grant behavior after withdrawal.
 - [x] Add a Strip Query Strings privacy setting.
   - It uses Boomerang's native `strip_query_string` option, remains disabled by
-    default for compatibility, and preserves query parameters in the Beacon URL.
+    default for compatibility, and preserves query parameters in the Beacon Endpoint.
 
 ## Validation and state feedback
 
-- [x] Show a visible incomplete-configuration state when Beacon URL or Brum Site ID
+- [x] Show a visible incomplete-configuration state when Beacon Endpoint or Brum Site ID
   is missing, making clear that monitoring remains disabled.
 - [x] Add field-level invalid-state feedback comparable to WordPress warnings and
   inline errors while retaining Magento's server-side validation.
@@ -82,7 +82,7 @@ Legend:
 - [x] Disable or hide irrelevant dependent controls when the module is disabled.
   - Magento's native field dependencies hide and disable privacy, wait, and
     developer runtime controls. Stored scoped values remain intact.
-  - Boomerang version, Beacon URL, and Brum Site ID stay visible so
+  - Boomerang version, Beacon Endpoint, and Brum Site ID stay visible so
     administrators can inspect or prepare identity configuration before enabling.
 - [x] Reveal Wait After Onload milliseconds only when Wait After Onload is enabled.
 - [x] Hide consent-specific controls when the module itself is disabled.
@@ -112,10 +112,11 @@ Legend:
 
 ## Presentation and discoverability
 
-- [x] Align product casing and field terminology with WordPress.
-  - User-facing Magento copy now consistently uses `Basicrum`, `Beacon URL`, and
+- [x] Align product casing and field terminology with Basicrum.
+  - User-facing Magento copy now consistently uses `Basicrum`, `Beacon Endpoint`, and
     `Brum Site ID`; internal `BasicRum_Analytics` class and module identifiers are
-    retained for backward compatibility.
+    retained for backward compatibility. `Beacon Endpoint` follows the Basicrum
+    backoffice terminology.
 - [x] Give the Magento configuration page a clearer Basicrum identity while
   retaining native Magento administration patterns.
   - The native tab and page are labeled Basicrum and Basicrum Settings, and the
@@ -123,8 +124,9 @@ Legend:
 - [x] Improve complex help content for narrower admin viewports.
   - Long callback names wrap, code fields remain within the available width, and
     copy controls wrap without changing Magento's native configuration layout.
-- [ ] Refresh `docs/media/admin-area.png` after moving privacy into General Settings.
-  - The previous capture predates this grouping change.
+- [ ] Refresh `docs/media/admin-area.png` after moving privacy into General Settings
+  and renaming the Beacon Endpoint field.
+  - The previous capture predates these UI changes.
 
 ## Intentional Magento-specific behavior
 

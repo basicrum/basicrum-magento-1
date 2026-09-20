@@ -68,11 +68,12 @@ terminology_paths=(
     docs
     app/code/community/BasicRum/Analytics/Block/Adminhtml
     app/code/community/BasicRum/Analytics/Model/System/Config/Backend
+    app/code/community/BasicRum/Analytics/Model/System/Config/Source
     app/code/community/BasicRum/Analytics/etc/system.xml
     app/code/community/BasicRum/Analytics/etc/adminhtml.xml
     app/locale/en_US/BasicRum_Analytics.csv
 )
-if grep -R --line-number -E 'BasicRUM|Beacon Endpoint URL' "${terminology_paths[@]}"; then
+if grep -R --line-number -E 'BasicRUM|Beacon URL|Beacon Endpoint URL' "${terminology_paths[@]}"; then
     echo "Stale user-facing Basicrum terminology found" >&2
     exit 1
 fi

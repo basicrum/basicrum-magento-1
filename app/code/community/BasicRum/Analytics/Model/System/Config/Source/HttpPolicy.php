@@ -2,7 +2,7 @@
 declare(strict_types=1);
 
 /**
- * Plain-language HTTP policy choices for Beacon URLs.
+ * Plain-language HTTP policy choices for Beacon Endpoints.
  */
 class BasicRum_Analytics_Model_System_Config_Source_HttpPolicy
 {
@@ -16,11 +16,11 @@ class BasicRum_Analytics_Model_System_Config_Source_HttpPolicy
         return array(
             array(
                 'value' => '0',
-                'label' => $helper->__('Require HTTPS Beacon URLs (recommended)'),
+                'label' => $helper->__('Require HTTPS Beacon Endpoints (recommended)'),
             ),
             array(
                 'value' => '1',
-                'label' => $helper->__('Allow HTTP Beacon URLs for local testing'),
+                'label' => $helper->__('Allow HTTP Beacon Endpoints for local testing'),
             ),
         );
     }
