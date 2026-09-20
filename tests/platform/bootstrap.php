@@ -14,24 +14,14 @@ if ($platformRoot === false || !is_dir($platformRoot)) {
     exit(2);
 }
 
-if (!in_array($platform, array('magento-ce', 'openmage', 'maho'), true)) {
+if (!in_array($platform, array('magento-ce', 'openmage'), true)) {
     fwrite(STDERR, "Unsupported platform: {$platform}\n");
     exit(2);
 }
 
 chdir($platformRoot);
 
-if ($platform === 'maho') {
-    if (!defined('MAHO_ROOT_DIR')) {
-        define('MAHO_ROOT_DIR', $platformRoot);
-    }
-    if (!defined('MAHO_PUBLIC_DIR')) {
-        define('MAHO_PUBLIC_DIR', $platformRoot . '/public');
-    }
-    require $platformRoot . '/vendor/autoload.php';
-} else {
-    require $platformRoot . '/app/Mage.php';
-}
+require $platformRoot . '/app/Mage.php';
 
 Mage::app('default');
 

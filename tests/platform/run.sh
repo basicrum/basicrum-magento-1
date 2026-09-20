@@ -27,17 +27,6 @@ case "$platform" in
             --no-interaction \
             --no-progress
         ;;
-    maho)
-        # Verify that the extension does not depend on Maho's optional global
-        # aliases for legacy Varien form-element classes.
-        export MAHO_ENABLE_VARIEN_ALIASES=0
-        composer install \
-            --working-dir="$platform_root" \
-            --no-dev \
-            --prefer-dist \
-            --no-interaction \
-            --no-progress
-        ;;
     *)
         echo "Unsupported platform: $platform" >&2
         exit 2
@@ -65,20 +54,13 @@ common_install_args=(
     --admin_password BasicrumAdmin123
 )
 
-if [[ "$platform" == "maho" ]]; then
-    (
-        cd "$platform_root"
-        ./maho install "${common_install_args[@]}"
-    )
-else
-    (
-        cd "$platform_root"
-        php -d memory_limit=-1 install.php -- \
-            "${common_install_args[@]}" \
-            --use_rewrites no \
-            --skip_url_validation yes
-    )
-fi
+(
+    cd "$platform_root"
+    php -d memory_limit=-1 install.php -- \
+        "${common_install_args[@]}" \
+        --use_rewrites no \
+        --skip_url_validation yes
+)
 
 php "$plugin_root/tests/platform/verify.php" "$platform_root" "$platform"
 php "$plugin_root/tests/platform/verify-http-policy.php" "$platform_root" "$platform"

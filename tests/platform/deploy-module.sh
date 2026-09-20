@@ -11,7 +11,7 @@ platform_root="$2"
 plugin_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 
 case "$platform" in
-    magento-ce|openmage|maho)
+    magento-ce|openmage)
         ;;
     *)
         echo "Unsupported platform: $platform" >&2
@@ -32,12 +32,6 @@ while read -r source_path destination_path extra; do
     if [[ -n "${extra:-}" ]]; then
         echo "Invalid modman row: $source_path $destination_path $extra" >&2
         exit 1
-    fi
-
-    # Maho's public document root contains static assets. PHP module files
-    # retain their Magento 1 paths, while root-level js/ maps to public/js/.
-    if [[ "$platform" == "maho" && "$destination_path" == js/* ]]; then
-        destination_path="public/$destination_path"
     fi
 
     mkdir -p "$platform_root/$(dirname "$destination_path")"

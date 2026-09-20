@@ -280,13 +280,12 @@ basicrum_platform_assert(
     'consent configuration did not render the consent loader'
 );
 
-$assetRoot = $platform === 'maho' ? $platformRoot . '/public' : $platformRoot;
 basicrum_platform_assert(
-    is_file($assetRoot . '/js/basicrum/loaders/consent-boomerang-loader-v1-15.min.js'),
+    is_file($platformRoot . '/js/basicrum/loaders/consent-boomerang-loader-v1-15.min.js'),
     'consent loader is not deployed under the platform document root'
 );
 basicrum_platform_assert(
-    is_file($assetRoot . '/js/basicrum/admin/consent-info.js'),
+    is_file($platformRoot . '/js/basicrum/admin/consent-info.js'),
     'admin consent copy behavior is not deployed under the platform document root'
 );
 

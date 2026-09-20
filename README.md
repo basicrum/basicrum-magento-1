@@ -1,10 +1,10 @@
 # Basicrum Analytics for Magento 1
 
-Basicrum Analytics integrates Magento 1, OpenMage LTS, and Maho Commerce stores with a Basicrum collector using the bundled Boomerang Real User Monitoring library.
+Basicrum Analytics integrates Magento 1 and OpenMage LTS stores with a Basicrum collector using the bundled Boomerang Real User Monitoring library.
 
 ## Requirements
 
-- Magento 1.x, OpenMage LTS, or Maho Commerce
+- Magento 1.x or OpenMage LTS
 - PHP 7.0 or newer
 - A Beacon URL and matching Brum Site ID supplied by the Basicrum backend
 
@@ -28,7 +28,6 @@ Copy these paths into the matching locations under the Magento root:
 - `js/basicrum`
 
 Clear Magento configuration and layout caches after installation or upgrade.
-On Maho, place `js/basicrum` under `public/js/basicrum` and run `composer dump-autoload` after deploying the PHP files so Maho rebuilds its module class map.
 
 ## Configuration
 
@@ -187,7 +186,6 @@ It also installs the extension into a real application and boots the storefront 
 |----------|---------|----------|
 | Magento CE 1.9.4.5 | PHP 7.4 | Native setup resource, configuration/rendering, scopes, and live storefront |
 | OpenMage 20.18.0 | PHP 8.3 | Native setup resource, configuration/rendering, scopes, and live storefront |
-| Maho 26.9.0 | PHP 8.3 | Native setup resource, admin rendering with global Varien aliases disabled, configuration/rendering, scopes, and live storefront |
 
 The real-install jobs exercise a fresh privacy-first installation, storefront-triggered upgrades from a simulated pre-1.1.0 database with and without explicit consent or legacy HTTP behavior, incomplete and unsafe configuration, HTTPS enforcement and development HTTP mode, native admin saves with explicit/omitted/newly inherited HTTP policy at default/website/store scopes, immediate and consent-controlled rendering, query-string privacy, the 30-second wait cap, default/website/store inheritance, frontend and admin block resolution, callback-compatible loader delivery, and disabled-mode suppression. Platform versions are deliberately pinned so upstream releases cannot silently change the test baseline; updates should be made explicitly after local validation.
 

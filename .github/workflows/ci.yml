@@ -64,11 +64,6 @@ jobs:
             repository: OpenMage/magento-lts
             ref: v20.18.0
             php: "8.3"
-          - name: Maho 26.9.0 / PHP 8.3
-            platform: maho
-            repository: MahoCommerce/maho
-            ref: 26.9.0
-            php: "8.3"
     services:
       database:
         image: mariadb:10.11

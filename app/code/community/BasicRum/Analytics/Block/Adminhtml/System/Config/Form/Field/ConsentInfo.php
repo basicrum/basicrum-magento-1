@@ -1,15 +1,6 @@
 <?php
 declare(strict_types=1);
 
-// Maho can disable its global Varien aliases. Keep the Magento 1 method
-// signature compatible without requiring those aliases throughout the store.
-if (defined('MAHO_ROOT_DIR')
-    && !class_exists('Varien_Data_Form_Element_Abstract', false)
-    && class_exists('Maho\\Data\\Form\\Element\\AbstractElement')
-) {
-    class_alias('Maho\\Data\\Form\\Element\\AbstractElement', 'Varien_Data_Form_Element_Abstract');
-}
-
 /**
  * Custom renderer for consent/opt-in information in admin config.
  */

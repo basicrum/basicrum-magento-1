@@ -11,9 +11,14 @@ platform_root="$(cd "$2" && pwd)"
 plugin_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 
 document_root="$platform_root"
-if [[ "$platform" == "maho" ]]; then
-    document_root="$platform_root/public"
-fi
+case "$platform" in
+    magento-ce|openmage)
+        ;;
+    *)
+        echo "Unsupported platform: $platform" >&2
+        exit 2
+        ;;
+esac
 
 server_log="$platform_root/var/log/basicrum-platform-server.log"
 mkdir -p "$(dirname "$server_log")"

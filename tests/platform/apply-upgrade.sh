@@ -13,9 +13,6 @@ case "$platform" in
     magento-ce|openmage)
         document_root="$platform_root"
         ;;
-    maho)
-        document_root="$platform_root/public"
-        ;;
     *)
         echo "Unsupported platform: $platform" >&2
         exit 2
