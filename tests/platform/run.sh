@@ -82,6 +82,7 @@ fi
 
 php "$plugin_root/tests/platform/verify.php" "$platform_root" "$platform"
 php "$plugin_root/tests/platform/verify-http-policy.php" "$platform_root" "$platform"
+php "$plugin_root/tests/platform/verify-privacy-fields.php" "$platform_root" "$platform"
 bash "$plugin_root/tests/platform/verify-live.sh" "$platform" "$platform_root"
 
 php "$plugin_root/tests/platform/prepare-upgrade.php" "$platform_root" "$platform" legacy

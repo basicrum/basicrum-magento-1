@@ -50,6 +50,28 @@ function basicrum_config_dependency_map(SimpleXMLElement $field, $defaultFieldse
     return $dependencies;
 }
 
+$tests['general privacy controls preserve paths scopes and installation defaults'] = function () use ($root) {
+    $xml = simplexml_load_file($root . '/app/code/community/BasicRum/Analytics/etc/system.xml');
+    $groups = $xml->sections->basicrum_analytics->groups;
+    basicrum_assert_true(!isset($groups->privacy), 'privacy must not have a separate admin accordion');
+    foreach (array('strip_query_string', 'opt_in_required') as $name) {
+        $field = $groups->general->fields->{$name};
+        basicrum_assert_same(
+            'basicrum_analytics/privacy/' . $name,
+            (string) $field->config_path,
+            'moving ' . $name . ' must preserve its stored configuration path'
+        );
+        foreach (array('default', 'website', 'store') as $scope) {
+            basicrum_assert_same('1', (string) $field->{'show_in_' . $scope}, $name . ': missing scope ' . $scope);
+        }
+    }
+    $defaults = simplexml_load_file($root . '/app/code/community/BasicRum/Analytics/etc/config.xml')
+        ->default->basicrum_analytics;
+    basicrum_assert_same('0', (string) $defaults->general->enabled, 'monitoring must be disabled by default');
+    basicrum_assert_same('1', (string) $defaults->privacy->opt_in_required, 'new installs must require consent');
+    basicrum_assert_same('0', (string) $defaults->privacy->strip_query_string, 'query-string default must not change');
+};
+
 $tests['admin consent choices preserve values and explain behavior'] = function () {
     basicrum_test_reset();
 
@@ -81,7 +103,7 @@ $tests['admin HTTP policy choices explain production and development behavior'] 
 };
 
 $tests['admin consent guidance is a full-width dependent row'] = function () use ($root) {
-    $elementId = 'basicrum_analytics_privacy_consent_integration_info';
+    $elementId = 'basicrum_analytics_general_consent_integration_info';
     $renderer = new BasicRum_Analytics_Block_Adminhtml_System_Config_Form_Field_ConsentInfo();
     $html = $renderer->render(new Varien_Data_Form_Element_Abstract($elementId));
 
@@ -171,7 +193,7 @@ $tests['admin consent guidance is a full-width dependent row'] = function () use
 
     $xml = simplexml_load_file($root . '/app/code/community/BasicRum/Analytics/etc/system.xml');
     basicrum_assert_true($xml !== false, 'system configuration XML must parse');
-    $privacyFields = $xml->sections->basicrum_analytics->groups->privacy->fields;
+    $privacyFields = $xml->sections->basicrum_analytics->groups->general->fields;
     basicrum_assert_same(
         'basicrum_analytics/system_config_source_consentMode',
         (string) $privacyFields->opt_in_required->source_model,
@@ -205,7 +227,7 @@ $tests['admin hides runtime controls while monitoring is disabled'] = function (
 
     $groups = $xml->sections->basicrum_analytics->groups;
     $generalFields = $groups->general->fields;
-    $privacyFields = $groups->privacy->fields;
+    $privacyFields = $generalFields;
     $waitFields = $groups->wait_after_onload->fields;
     $developerFields = $groups->developer->fields;
 
@@ -259,20 +281,20 @@ $tests['admin hides runtime controls while monitoring is disabled'] = function (
     $generalEnabledOnly = array('general/enabled' => '1');
     basicrum_assert_same(
         $generalEnabledOnly,
-        basicrum_config_dependency_map($privacyFields->strip_query_string, 'privacy'),
+        basicrum_config_dependency_map($privacyFields->strip_query_string, 'general'),
         'query-string privacy must depend on monitoring being enabled'
     );
     basicrum_assert_same(
         $generalEnabledOnly,
-        basicrum_config_dependency_map($privacyFields->opt_in_required, 'privacy'),
+        basicrum_config_dependency_map($privacyFields->opt_in_required, 'general'),
         'consent mode must depend on monitoring being enabled'
     );
     basicrum_assert_same(
         array(
             'general/enabled' => '1',
-            'privacy/opt_in_required' => '1',
+            'general/opt_in_required' => '1',
         ),
-        basicrum_config_dependency_map($privacyFields->consent_integration_info, 'privacy'),
+        basicrum_config_dependency_map($privacyFields->consent_integration_info, 'general'),
         'consent guidance must require both enabled monitoring and consent-controlled mode'
     );
     basicrum_assert_same(
@@ -386,8 +408,8 @@ $tests['admin required-setting feedback respects validity enabled state and reso
         ->addElement('basicrum_analytics_general_beacon_endpoint', $validBeacon)
         ->addElement('basicrum_analytics_general_brum_site_id', $validSiteId)
         ->addElement(
-            'basicrum_analytics_privacy_opt_in_required',
-            new Varien_Data_Form_Element_Abstract('basicrum_analytics_privacy_opt_in_required', '0')
+            'basicrum_analytics_general_opt_in_required',
+            new Varien_Data_Form_Element_Abstract('basicrum_analytics_general_opt_in_required', '0')
         );
 
     $validHtml = $renderer->render($validBeacon) . $renderer->render($validSiteId);
@@ -438,13 +460,13 @@ $tests['admin required-setting feedback respects validity enabled state and reso
         '550e8400-e29b-41d4-a716-446655440000'
     );
     $consentRequired = new Varien_Data_Form_Element_Abstract(
-        'basicrum_analytics_privacy_opt_in_required',
+        'basicrum_analytics_general_opt_in_required',
         '1'
     );
     $consentForm->addElement('basicrum_analytics_general_enabled', $consentEnabled)
         ->addElement('basicrum_analytics_general_beacon_endpoint', $consentBeacon)
         ->addElement('basicrum_analytics_general_brum_site_id', $consentSiteId)
-        ->addElement('basicrum_analytics_privacy_opt_in_required', $consentRequired);
+        ->addElement('basicrum_analytics_general_opt_in_required', $consentRequired);
     $consentHtml = $renderer->render($consentSiteId);
     basicrum_assert_contains(
         'Monitoring status: Waiting for consent',

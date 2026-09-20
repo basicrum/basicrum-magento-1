@@ -31,8 +31,9 @@ Legend:
 - [x] Provide Wait After Onload enablement and a millisecond delay field.
 - [x] Document and enforce the 0–30000 millisecond delay range.
 - [x] Provide a Use Unminified Loaders developer setting.
-- [x] Keep settings grouped into General, Privacy, Performance/Wait, and Developer
-  sections.
+- [x] Keep privacy controls and consent guidance within General Settings, with
+  separate Wait After Onload and Developer sections. Existing privacy
+  configuration paths and scope inheritance are preserved.
 
 ## Consent and privacy experience
 
@@ -122,9 +123,8 @@ Legend:
 - [x] Improve complex help content for narrower admin viewports.
   - Long callback names wrap, code fields remain within the available width, and
     copy controls wrap without changing Magento's native configuration layout.
-- [x] Replace `docs/media/admin-area.png` after the admin UI work is complete.
-  - Captured from the verified OpenMage 20.18.0 test installation at Default
-    Config scope with consent-controlled monitoring enabled.
+- [ ] Refresh `docs/media/admin-area.png` after moving privacy into General Settings.
+  - The previous capture predates this grouping change.
 
 ## Intentional Magento-specific behavior
 

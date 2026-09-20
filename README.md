@@ -34,6 +34,8 @@ On Maho, place `js/basicrum` under `public/js/basicrum` and run `composer dump-a
 
 Go to **System > Configuration > Basicrum > Basicrum Settings**. Configuration remains available at Magento's default, website, and store scopes.
 
+**Enable Basicrum** defaults to **No (disabled)**. General Settings includes the collector identity, **Strip Query Strings**, **Require Consent Before Monitoring**, and consent integration guidance. The privacy controls retain their existing `basicrum_analytics/privacy/*` configuration paths and scoped values; only their placement in the admin changes.
+
 Monitoring scripts are emitted only when all of these conditions are met:
 
 - **Enable Basicrum** is set to Yes.

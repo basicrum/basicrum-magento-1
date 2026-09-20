@@ -82,7 +82,7 @@ $adminSection = Mage::getSingleton('adminhtml/config')->getSection('basicrum_ana
 basicrum_platform_assert($adminSection !== false, 'Magento did not merge the Basicrum admin configuration');
 $adminGroups = $adminSection->groups;
 $generalFields = $adminGroups->general->fields;
-$privacyFields = $adminGroups->privacy->fields;
+$privacyFields = $generalFields;
 $waitFields = $adminGroups->wait_after_onload->fields;
 $developerFields = $adminGroups->developer->fields;
 $generalEnabledOnly = array('general/enabled' => '1');
@@ -104,20 +104,20 @@ basicrum_platform_assert_same(
 );
 basicrum_platform_assert_same(
     $generalEnabledOnly,
-    basicrum_platform_dependency_map($privacyFields->strip_query_string, 'privacy'),
+    basicrum_platform_dependency_map($privacyFields->strip_query_string, 'general'),
     'query-string privacy does not depend on enabled monitoring'
 );
 basicrum_platform_assert_same(
     $generalEnabledOnly,
-    basicrum_platform_dependency_map($privacyFields->opt_in_required, 'privacy'),
+    basicrum_platform_dependency_map($privacyFields->opt_in_required, 'general'),
     'consent mode does not depend on enabled monitoring'
 );
 basicrum_platform_assert_same(
     array(
         'general/enabled' => '1',
-        'privacy/opt_in_required' => '1',
+        'general/opt_in_required' => '1',
     ),
-    basicrum_platform_dependency_map($privacyFields->consent_integration_info, 'privacy'),
+    basicrum_platform_dependency_map($privacyFields->consent_integration_info, 'general'),
     'consent guidance dependencies were not preserved by the native config parser'
 );
 basicrum_platform_assert_same(

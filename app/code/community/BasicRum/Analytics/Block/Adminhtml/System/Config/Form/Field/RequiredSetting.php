@@ -19,7 +19,7 @@ class BasicRum_Analytics_Block_Adminhtml_System_Config_Form_Field_RequiredSettin
     const ENABLED_FIELD_ID = 'basicrum_analytics_general_enabled';
     const BEACON_FIELD_ID = 'basicrum_analytics_general_beacon_endpoint';
     const SITE_ID_FIELD_ID = 'basicrum_analytics_general_brum_site_id';
-    const CONSENT_FIELD_ID = 'basicrum_analytics_privacy_opt_in_required';
+    const CONSENT_FIELD_ID = 'basicrum_analytics_general_opt_in_required';
 
     /**
      * Render the native field row and monitoring status after the Site ID.
