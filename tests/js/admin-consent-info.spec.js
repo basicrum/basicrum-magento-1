@@ -1,7 +1,29 @@
+const fs = require("node:fs");
 const path = require("node:path");
 const { test, expect } = require("@playwright/test");
 
 const scriptPath = path.resolve(__dirname, "../../js/basicrum/admin/consent-info.js");
+
+for (const themeHeight of ["auto", "2em"]) {
+  test(`callback textareas show five lines with theme height ${themeHeight}`, async ({ page }) => {
+    const renderer = fs.readFileSync(path.resolve(__dirname,
+      "../../app/code/community/BasicRum/Analytics/Block/Adminhtml/System/Config/Form/Field/ConsentInfo.php"), "utf8");
+    const snippets = renderer.match(/<textarea\b[^>]*>[\s\S]*?<\/textarea>/g);
+    expect(snippets).toHaveLength(2);
+    await page.setContent(`<style>textarea { height: ${themeHeight}; }</style>${snippets.join("\n")}`);
+
+    for (const textarea of await page.locator("textarea").all()) {
+      await expect(textarea).toHaveAttribute("rows", "5");
+      await expect(textarea).toHaveCSS("resize", "vertical");
+      const visibleLines = await textarea.evaluate((element) => {
+        const style = getComputedStyle(element);
+        return (element.clientHeight - parseFloat(style.paddingTop) - parseFloat(style.paddingBottom))
+          / parseFloat(style.lineHeight);
+      });
+      expect(visibleLines).toBeGreaterThanOrEqual(5);
+    }
+  });
+}
 
 async function renderConsentExamples(page) {
   await page.setContent(`

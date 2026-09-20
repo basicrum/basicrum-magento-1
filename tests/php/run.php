@@ -170,6 +170,11 @@ $tests['admin consent guidance is a full-width dependent row'] = function () use
     basicrum_assert_true($allowStart !== false && $denyStart !== false, 'both callback snippets must render');
     $allowSnippet = substr($html, $allowStart, strpos($html, '</textarea>', $allowStart) - $allowStart);
     $denySnippet = substr($html, $denyStart, strpos($html, '</textarea>', $denyStart) - $denyStart);
+    foreach (array($allowSnippet, $denySnippet) as $snippet) {
+        basicrum_assert_contains('rows="5"', $snippet, 'each callback textarea must show five rows');
+        basicrum_assert_contains('min-height: 100px', $snippet, 'admin theme styles must not shrink callback textareas');
+        basicrum_assert_contains('resize: vertical', $snippet, 'callback textareas must remain vertically resizable');
+    }
     basicrum_assert_contains(
         'OPT_IN_BASICRUM_LOADER_WRAPPER',
         $allowSnippet,

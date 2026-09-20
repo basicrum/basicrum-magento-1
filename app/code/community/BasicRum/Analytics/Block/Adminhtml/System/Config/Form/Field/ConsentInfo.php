@@ -45,7 +45,7 @@ class BasicRum_Analytics_Block_Adminhtml_System_Config_Form_Field_ConsentInfo
     <p style="color: #555;"><strong>Connect both decisions:</strong> place the allow snippet only in your consent tool's allow or grant callback, and the deny snippet in its deny, expiry, or withdrawal callback. Do not run the two snippets together.</p>
     <div style="margin-top: 12px;">
         <label for="{$allowSnippetId}" style="display: block; margin-bottom: 4px;"><strong>Allow or grant callback</strong></label>
-        <textarea id="{$allowSnippetId}" readonly="readonly" spellcheck="false" rows="3" style="box-sizing: border-box; width: 100%; max-width: 100%; padding: 8px; font-family: Monaco, Menlo, Consolas, monospace; font-size: 11px; line-height: 1.5; color: #f8f8f2; background: #2d2d2d; border: 0; border-radius: 4px; resize: vertical;">if (typeof window.OPT_IN_BASICRUM_LOADER_WRAPPER === 'function') {
+        <textarea id="{$allowSnippetId}" readonly="readonly" spellcheck="false" rows="5" style="box-sizing: border-box; width: 100%; max-width: 100%; min-height: 100px; padding: 8px; font-family: Monaco, Menlo, Consolas, monospace; font-size: 11px; line-height: 1.5; color: #f8f8f2; background: #2d2d2d; border: 0; border-radius: 4px; resize: vertical;">if (typeof window.OPT_IN_BASICRUM_LOADER_WRAPPER === 'function') {
     window.OPT_IN_BASICRUM_LOADER_WRAPPER();
 }</textarea>
         <p style="display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin: 5px 0 0;">
@@ -55,7 +55,7 @@ class BasicRum_Analytics_Block_Adminhtml_System_Config_Form_Field_ConsentInfo
     </div>
     <div style="margin-top: 14px;">
         <label for="{$denySnippetId}" style="display: block; margin-bottom: 4px;"><strong>Deny, expiry, or withdrawal callback</strong></label>
-        <textarea id="{$denySnippetId}" readonly="readonly" spellcheck="false" rows="3" style="box-sizing: border-box; width: 100%; max-width: 100%; padding: 8px; font-family: Monaco, Menlo, Consolas, monospace; font-size: 11px; line-height: 1.5; color: #f8f8f2; background: #2d2d2d; border: 0; border-radius: 4px; resize: vertical;">if (typeof window.OPT_OUT_BASICRUM_LOADER_WRAPPER === 'function') {
+        <textarea id="{$denySnippetId}" readonly="readonly" spellcheck="false" rows="5" style="box-sizing: border-box; width: 100%; max-width: 100%; min-height: 100px; padding: 8px; font-family: Monaco, Menlo, Consolas, monospace; font-size: 11px; line-height: 1.5; color: #f8f8f2; background: #2d2d2d; border: 0; border-radius: 4px; resize: vertical;">if (typeof window.OPT_OUT_BASICRUM_LOADER_WRAPPER === 'function') {
     window.OPT_OUT_BASICRUM_LOADER_WRAPPER();
 }</textarea>
         <p style="display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin: 5px 0 0;">
