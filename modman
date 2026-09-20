@@ -1,4 +1,4 @@
-# BasicRum Analytics Module for Magento 1
+# Basicrum Analytics Module for Magento 1
 # This Modman file maps all the module files to their correct locations in Magento
 
 # Module declaration file
@@ -6,14 +6,21 @@ app/etc/modules/BasicRum_Analytics.xml                                         a
 
 # Module code files
 app/code/community/BasicRum/Analytics/Block/Adminhtml/System/Config/Form/Field/ConsentInfo.php   app/code/community/BasicRum/Analytics/Block/Adminhtml/System/Config/Form/Field/ConsentInfo.php
+app/code/community/BasicRum/Analytics/Block/Adminhtml/System/Config/Form/Field/RequiredSetting.php app/code/community/BasicRum/Analytics/Block/Adminhtml/System/Config/Form/Field/RequiredSetting.php
 app/code/community/BasicRum/Analytics/Block/Boomerang/Loader.php               app/code/community/BasicRum/Analytics/Block/Boomerang/Loader.php
 app/code/community/BasicRum/Analytics/Helper/Data.php                          app/code/community/BasicRum/Analytics/Helper/Data.php
 app/code/community/BasicRum/Analytics/Helper/PageTypeDetector.php              app/code/community/BasicRum/Analytics/Helper/PageTypeDetector.php
+app/code/community/BasicRum/Analytics/Model/Setup/HttpPolicyDefault.php        app/code/community/BasicRum/Analytics/Model/Setup/HttpPolicyDefault.php
+app/code/community/BasicRum/Analytics/Model/Setup/PrivacyDefault.php           app/code/community/BasicRum/Analytics/Model/Setup/PrivacyDefault.php
+app/code/community/BasicRum/Analytics/Model/System/Config/Source/HttpPolicy.php app/code/community/BasicRum/Analytics/Model/System/Config/Source/HttpPolicy.php
+app/code/community/BasicRum/Analytics/Model/System/Config/Source/ConsentMode.php app/code/community/BasicRum/Analytics/Model/System/Config/Source/ConsentMode.php
 app/code/community/BasicRum/Analytics/Model/System/Config/Source/Version.php   app/code/community/BasicRum/Analytics/Model/System/Config/Source/Version.php
+app/code/community/BasicRum/Analytics/Model/System/Config/Backend/BeaconEndpoint.php app/code/community/BasicRum/Analytics/Model/System/Config/Backend/BeaconEndpoint.php
 app/code/community/BasicRum/Analytics/Model/System/Config/Backend/SiteId.php   app/code/community/BasicRum/Analytics/Model/System/Config/Backend/SiteId.php
 app/code/community/BasicRum/Analytics/etc/config.xml                           app/code/community/BasicRum/Analytics/etc/config.xml
 app/code/community/BasicRum/Analytics/etc/adminhtml.xml                        app/code/community/BasicRum/Analytics/etc/adminhtml.xml
 app/code/community/BasicRum/Analytics/etc/system.xml                           app/code/community/BasicRum/Analytics/etc/system.xml
+app/code/community/BasicRum/Analytics/sql/basicrum_analytics_setup/install-1.1.0.php app/code/community/BasicRum/Analytics/sql/basicrum_analytics_setup/install-1.1.0.php
 
 # Locale/Translation files
 app/locale/en_US/BasicRum_Analytics.csv                                        app/locale/en_US/BasicRum_Analytics.csv
@@ -21,6 +28,8 @@ app/locale/en_US/BasicRum_Analytics.csv                                        a
 # Frontend files
 app/design/frontend/base/default/layout/basicrum_analytics.xml                 app/design/frontend/base/default/layout/basicrum_analytics.xml
 js/basicrum/boomerangs/boomerang-1.815.60.cutting-edge.min.js                  js/basicrum/boomerangs/boomerang-1.815.60.cutting-edge.min.js
+js/basicrum/LICENSE.txt                                                        js/basicrum/LICENSE.txt
+js/basicrum/admin/consent-info.js                                              js/basicrum/admin/consent-info.js
 js/basicrum/loaders/boomerang-loader-v15.js                                    js/basicrum/loaders/boomerang-loader-v15.js
 js/basicrum/loaders/boomerang-loader-v15.min.js                                js/basicrum/loaders/boomerang-loader-v15.min.js
 js/basicrum/loaders/consent-boomerang-loader-v1-15.js                          js/basicrum/loaders/consent-boomerang-loader-v1-15.js

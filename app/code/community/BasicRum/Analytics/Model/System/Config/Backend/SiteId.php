@@ -6,8 +6,6 @@ declare(strict_types=1);
  */
 class BasicRum_Analytics_Model_System_Config_Backend_SiteId extends Mage_Core_Model_Config_Data
 {
-    const UUID_PATTERN = '/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i';
-
     /**
      * Validate the value before saving
      *
@@ -16,13 +14,15 @@ class BasicRum_Analytics_Model_System_Config_Backend_SiteId extends Mage_Core_Mo
      */
     protected function _beforeSave()
     {
-        $value = (string) $this->getValue();
+        $value = trim((string) $this->getValue());
 
-        if ($value !== '' && !preg_match(self::UUID_PATTERN, $value)) {
+        if ($value !== '' && !BasicRum_Analytics_Helper_Data::isValidBrumSiteId($value)) {
             Mage::throwException(
-                Mage::helper('basicrum_analytics')->__('BasicRUM Site ID must be a valid UUID (e.g. e926c1a2-7e33-4f54-90d0-e6e31f3ad43d).')
+                Mage::helper('basicrum_analytics')->__('Brum Site ID must be a valid UUID v4 (e.g. e926c1a2-7e33-4f54-90d0-e6e31f3ad43d).')
             );
         }
+
+        $this->setValue($value);
 
         return parent::_beforeSave();
     }

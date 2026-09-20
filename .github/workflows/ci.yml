@@ -1,0 +1,139 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - '**'
+    tags-ignore:
+      - 'v*.*.*' # Version tags run this workflow through release.yml.
+  pull_request:
+  workflow_call:
+    inputs:
+      release_tag:
+        type: string
+        default: ''
+    outputs:
+      archive_name:
+        value: ${{ jobs.browser-and-package.outputs.archive_name }}
+
+permissions:
+  contents: read
+
+jobs:
+  php:
+    name: PHP ${{ matrix.php }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        php: ["7.0", "7.4", "8.3"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          coverage: none
+      - name: PHP syntax
+        run: find app tests/php tests/platform -type f -name '*.php' -print0 | xargs -0 -n1 php -l
+      - name: PHP configuration and rendering tests
+        run: php tests/php/run.php
+
+  browser-and-package:
+    name: Browser and package checks
+    runs-on: ubuntu-latest
+    outputs:
+      archive_name: ${{ steps.package.outputs.archive_name }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - name: Install JavaScript dependencies
+        run: npm ci
+      - name: Install Chromium
+        run: npx playwright install --with-deps chromium
+      - name: Browser loader tests
+        run: npm test
+      - name: Install XML and archive tools
+        run: sudo apt-get update && sudo apt-get install -y libxml2-utils zip unzip
+      - name: XML and package checks
+        run: bash tests/check-package.sh
+      - name: Release tooling regression tests
+        run: |
+          node --test tests/release/version.test.js
+          bash tests/release/package.sh
+      - name: Build installable release ZIP
+        id: package
+        env:
+          BASICRUM_RELEASE_TAG: ${{ inputs.release_tag }}
+        run: |
+          version="$(node tools/release-version.js)"
+          bash tools/build-release.sh
+          echo "archive_name=basicrum-magento-1-$version.zip" >> "$GITHUB_OUTPUT"
+      - name: Upload candidate ZIP and checksum
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: basicrum-magento-1-release
+          path: |
+            release/*.zip
+            release/*.zip.sha256
+          if-no-files-found: error
+          retention-days: 14
+
+  platform-matrix:
+    name: ${{ matrix.name }}
+    needs: browser-and-package
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: Magento CE 1.9.4.5 / PHP 7.4
+            platform: magento-ce
+            repository: OpenMage/magento-mirror
+            ref: 1.9.4.5
+            php: "7.4"
+          - name: OpenMage 20.18.0 / PHP 8.3
+            platform: openmage
+            repository: OpenMage/magento-lts
+            ref: v20.18.0
+            php: "8.3"
+    services:
+      database:
+        image: mariadb:10.11
+        env:
+          MARIADB_DATABASE: basicrum
+          MARIADB_USER: basicrum
+          MARIADB_PASSWORD: basicrum
+          MARIADB_ROOT_PASSWORD: root
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="healthcheck.sh --connect --innodb_initialized"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          repository: ${{ matrix.repository }}
+          ref: ${{ matrix.ref }}
+          path: platform
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          coverage: none
+          extensions: ctype, curl, dom, ftp, gd, iconv, intl, mbstring, mysqli, pdo_mysql, simplexml, soap, zip
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: basicrum-magento-1-release
+          path: release
+      - name: Install release verification tools
+        run: sudo apt-get update && sudo apt-get install -y libxml2-utils unzip
+      - name: Install and verify packaged module on ${{ matrix.name }}
+        env:
+          BASICRUM_TEST_RELEASE_ZIP: ${{ github.workspace }}/release/${{ needs.browser-and-package.outputs.archive_name }}
+        run: bash tests/platform/run.sh "${{ matrix.platform }}" "$GITHUB_WORKSPACE/platform"
