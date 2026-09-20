@@ -2,6 +2,8 @@ name: CI
 
 on:
   push:
+    branches:
+      - '**'
     tags-ignore:
       - 'v*.*.*' # Version tags run this workflow through release.yml.
   pull_request:
